@@ -1,0 +1,349 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>OPC E-Filing — Dashboard</title>
+
+    <!-- 1) BOOTSTRAP 5 CSS (via CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <!-- 2) FONT AWESOME (for icons) -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-pM2eEdx..."
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+
+    <!-- 3) OUR REUSABLE STYLESHEET -->
+    <link rel="stylesheet" href="/css/style.css" />
+
+    <style>
+        /* Page‐specific overrides */
+        body {
+            background: var(--color-bg-light);
+            /* Push content down so it appears below the fixed navbar */
+            padding-top: calc(var(--header-height) + 10px);
+        }
+
+        .dashboard-hero {
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            padding: 4rem 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn var(--anim-medium) ease-in-out;
+        }
+
+            .dashboard-hero h1 {
+                font-size: 2.5rem;
+                color: var(--color-primary);
+            }
+
+            .dashboard-hero p {
+                font-size: 1.25rem;
+                color: var(--color-text);
+                margin-top: 1rem;
+            }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+            .dashboard-card .card {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 2rem 1rem;
+                background-color: var(--color-card-bg);
+                border: 1px solid var(--color-border);
+                border-radius: 0.75rem;
+                transition: transform var(--anim-fast), box-shadow var(--anim-fast);
+            }
+
+                .dashboard-card .card:hover {
+                    transform: translateY(-6px);
+                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+                }
+
+            .dashboard-card i {
+                font-size: 3rem;
+                color: var(--color-secondary);
+                margin-bottom: 1rem;
+                animation: fadeIn var(--anim-medium) ease-in-out;
+            }
+
+            .dashboard-card h3 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+                color: var(--color-primary);
+            }
+
+            .dashboard-card p {
+                font-size: 1rem;
+                color: var(--color-text);
+                margin-bottom: 1rem;
+            }
+
+            .dashboard-card .btn {
+                font-size: 0.9rem;
+            }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- ─── NAVBAR (same as index/login but Logout is JS-driven) ───────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png"
+                     alt="Lesotho Coat of Arms"
+                     width="32"
+                     height="32"
+                     class="me-2" />
+                <span class="fw-bold">OPC E-Filing</span>
+            </a>
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavDashboard"
+                    aria-controls="navbarNavDashboard"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDashboard">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Instead of an href, we call a JS function -->
+                        <a class="nav-link" href="#" id="logoutLink">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── DASHBOARD HERO / Welcome Banner ────────────────────────────────────────────────────────────────── -->
+    <section class="dashboard-hero">
+        <h1>Welcome, <span id="userName">[User]</span>!</h1>
+        <p>
+            Use the menu below to: submit drafting instructions, review pending tasks,
+            manage templates, and more—securely and efficiently.
+        </p>
+    </section>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── DASHBOARD CARDS GRID ────────────────────────────────────────────────────────────────────────────── -->
+    <div class="container flex-grow-1">
+        <div class="cards-grid">
+            <!-- Card 1: Submit Instruction -->
+            <div class="dashboard-card fade-in" style="animation-delay: 0.1s;">
+                <div class="card">
+                    <i class="fas fa-file-upload"></i>
+                    <h3>Submit Instruction</h3>
+                    <p>Upload new drafting instructions and attachments.</p>
+                    <a href="submit-instruction.html" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Go
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2: My Tasks -->
+            <div class="dashboard-card fade-in" style="animation-delay: 0.2s;">
+                <div class="card">
+                    <i class="fas fa-tasks"></i>
+                    <h3>My Tasks</h3>
+                    <p>Review or approve documents assigned to you.</p>
+                    <a href="tasks.html" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Go
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 3: Search Documents -->
+            <div class="dashboard-card fade-in" style="animation-delay: 0.3s;">
+                <div class="card">
+                    <i class="fas fa-search"></i>
+                    <h3>Search Documents</h3>
+                    <p>Find documents by title, subject, or metadata.</p>
+                    <a href="search.html" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Go
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 4: Templates -->
+            <div class="dashboard-card fade-in" style="animation-delay: 0.4s;">
+                <div class="card">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>Manage Templates</h3>
+                    <p>View, create, or edit drafting templates.</p>
+                    <a href="templates.html" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Go
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 5: User Profile -->
+            <div class="dashboard-card fade-in" style="animation-delay: 0.5s;">
+                <div class="card">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>My Profile</h3>
+                    <p>Update your information and settings.</p>
+                    <a href="profile.html" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Go
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ─── INSTRUCTION STATUS COUNTS ───────────────────────────────────────────── -->
+    <h3 class="mt-5 mb-3 text-center">📊 Instruction Status Overview</h3>
+    <div class="row" id="statusSummaryGrid"></div>
+
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── LOGOUT CONFIRMATION MODAL (Bootstrap) ─────────────────────────────────────────────────────────── -->
+    <div class="modal fade"
+         id="logoutModal"
+         tabindex="-1"
+         aria-labelledby="logoutModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to log out?
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button"
+                            class="btn btn-danger"
+                            id="confirmLogout">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── FOOTER ───────────────────────────────────────────────────────────────────────────────────────── ── -->
+    <footer class="bg-light text-center py-4 mt-auto">
+        <div class="container">
+            <p class="mb-1">
+                © 2025 Office of Parliamentary Counsel, Lesotho
+            </p>
+            <small>All rights reserved.</small>
+        </div>
+    </footer>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── BOOTSTRAP 5 JS (via CDN) ───────────────────────────────────────────────────────────────────────── -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ─── DASHBOARD SCRIPT ───────────────────────────────────────────────────────────────────────────────── -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1) Check for JWT token; if none exists, redirect immediately
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 2) Populate userName from JWT token
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const nameElem = document.getElementById('userName');
+                nameElem.textContent = payload.unique_name || payload.name || 'User';
+            } catch {
+                // If parsing fails, keep “[User]”
+            }
+
+            // 3) Show logout confirmation modal when “Logout” is clicked
+            const logoutLink = document.getElementById('logoutLink');
+            const logoutModal = new bootstrap.Modal(
+                document.getElementById('logoutModal')
+            );
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                logoutModal.show();
+            });
+
+            // 4) Actual logout when confirmed
+            document
+                .getElementById('confirmLogout')
+                .addEventListener('click', () => {
+                    // Clear the stored JWT
+                    localStorage.removeItem('jwtToken');
+                    // Redirect to login page
+                    window.location.href = 'login.html';
+                });
+        });
+
+        // 5) Fetch and display instruction counts
+        fetch('/api/Dashboard/InstructionCounts', {
+            headers: { Authorization: 'Bearer ' + token }
+        })
+            .then(res => res.json())
+            .then(data => {
+                const grid = document.getElementById('statusSummaryGrid');
+                const colors = {
+                    'Submitted': 'bg-secondary',
+                    'Logged': 'bg-info',
+                    'Assigned': 'bg-primary',
+                    'Draft Submitted': 'bg-warning text-dark',
+                    'Finalized': 'bg-success',
+                    'Returned': 'bg-danger'
+                };
+
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'col-md-4 col-sm-6 mb-4';
+                    card.innerHTML = `
+                <div class="card text-white ${colors[item.status] || 'bg-dark'} shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${item.status}</h5>
+                        <p class="display-6 fw-bold">${item.count}</p>
+                    </div>
+                </div>
+            `;
+                    grid.appendChild(card);
+                });
+            });
+
+    </script>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────────────────── -->
+</body>
+</html>

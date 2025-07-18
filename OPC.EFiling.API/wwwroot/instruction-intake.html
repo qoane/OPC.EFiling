@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Submit Drafting Instruction | OPC E-Filing</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Submit Drafting Instruction</h1>
+        <form id="instructionForm" enctype="multipart/form-data">
+            <label>Ministry / Department</label>
+            <input type="text" name="ministry" required />
+
+            <label>Subject</label>
+            <input type="text" name="Title" required />
+
+
+            <label>Reference Number</label>
+            <input type="text" name="referenceNumber" required />
+
+            <label>Contact Person</label>
+            <input type="text" name="contactPerson" required />
+
+            <label>Email</label>
+            <input type="email" name="email" required />
+
+            <label>Upload Drafting Instructions</label>
+            <input type="file" name="instructionFile" accept=".pdf,.doc,.docx" required />
+
+            <label>Additional Notes</label>
+            <textarea name="notes" rows="4"></textarea>
+
+            <button type="submit">Submit</button>
+        </form>
+        <div id="formMessage" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        document.getElementById("instructionForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            const token = localStorage.getItem("jwtToken");
+            if (!token) {
+                document.getElementById("formMessage").innerText = "Not logged in. Please log in first.";
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/DraftingInstructions", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        Authorization: "Bearer " + token
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || "Submission failed.");
+                }
+
+                const result = await response.json();
+                document.getElementById("formMessage").innerText = result.message || "Instruction submitted successfully!";
+                this.reset();
+            } catch (err) {
+                document.getElementById("formMessage").innerText = "Submission failed. " + err.message;
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,354 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Drafter Dashboard | OPC E-Filing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/styles.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f8f9fc;
+            color: #333;
+        }
+
+        header {
+            background-color: #2e59d9;
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            header h1 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1rem;
+        }
+
+            nav ul li {
+                display: inline;
+            }
+
+                nav ul li a {
+                    color: white;
+                    text-decoration: none;
+                    font-weight: bold;
+                }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-layout {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .editor-section {
+            flex: 3;
+        }
+
+        aside.sidebar {
+            flex: 1;
+            border-left: 1px solid #ccc;
+            padding-left: 1rem;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 1rem;
+            display: block;
+        }
+
+        button {
+            margin-right: 1rem;
+            margin-top: 1rem;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background-color: #4e73df;
+            color: white;
+        }
+
+        .submit-btn {
+            background-color: #1cc88a;
+            color: white;
+        }
+
+        #saveStatus {
+            margin-top: 0.5rem;
+            color: green;
+        }
+
+        #draftMessage {
+            margin-top: 1rem;
+            color: #e74a3b;
+            font-weight: bold;
+        }
+
+        aside h3 {
+            margin-top: 0;
+        }
+
+        aside ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+            aside ul li {
+                margin: 0.5rem 0;
+            }
+
+                aside ul li a {
+                    text-decoration: none;
+                    color: #2e59d9;
+                }
+
+                    aside ul li a:hover {
+                        text-decoration: underline;
+                    }
+    </style>
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+</head>
+<body>
+    <header>
+        <h1>OPC E-Filing System</h1>
+        <nav>
+            <ul>
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/instruction-intake.html">Submit Instruction</a></li>
+                <li><a href="/pc-allocation.html">PC Allocation</a></li>
+                <li><a href="/registry-logging.html">Registry Logging</a></li>
+                <li><a href="/drafter-dashboard.html">Drafter Dashboard</a></li>
+                <li><a href="/dashboard.html">Dashboard</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 style="text-align:center;">Drafter Dashboard</h2>
+
+        <div class="dashboard-layout">
+            <div class="editor-section">
+                <label for="instructionSelector">Select Assigned Instruction</label>
+                <select id="instructionSelector"></select>
+
+                <label for="editor">Draft Document</label>
+                <textarea id="editor" name="editor"></textarea>
+
+                <button class="save-btn" onclick="saveDraft()"><i class="fas fa-save"></i> Save Draft</button>
+                <button class="submit-btn" onclick="submitDraft()"><i class="fas fa-paper-plane"></i> Submit Draft</button>
+
+                <p id="saveStatus"></p>
+                <div id="draftMessage"></div>
+            </div>
+
+            <aside class="sidebar">
+                <h3>Quick Access</h3>
+                <ul id="recentDrafts"></ul>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        let editorInstance;
+        let autosaveTimer = null;
+        let selectedInstructionId = null;
+
+        ClassicEditor.create(document.querySelector('#editor'), {
+            toolbar: [
+                'heading', '|',
+                'bold', 'italic', 'underline', 'strikethrough', '|',
+                'alignment', 'indent', 'outdent', '|',
+                'link', 'bulletedList', 'numberedList', '|',
+                'blockQuote', 'insertTable', 'codeBlock', '|',
+                'undo', 'redo', 'imageUpload', 'mediaEmbed'
+            ]
+        }).then(editor => {
+            editorInstance = editor;
+            loadInstructions();
+        });
+
+        async function loadInstructions() {
+            const res = await fetch("/api/drafts/All", {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
+                }
+            });
+            const data = await res.json();
+            const select = document.getElementById("instructionSelector");
+
+            select.innerHTML = "";
+            data.forEach(instr => {
+                const option = document.createElement("option");
+                option.value = instr.draftingInstructionID;
+                option.textContent = `${instr.title}`;
+                select.appendChild(option);
+            });
+
+            updateRecentDrafts(data);
+
+            select.addEventListener("change", () => {
+                selectedInstructionId = select.value;
+                loadSavedDraft(selectedInstructionId);
+            });
+
+            if (data.length > 0) {
+                select.value = data[0].draftingInstructionID;
+                selectedInstructionId = data[0].draftingInstructionID;
+                loadSavedDraft(selectedInstructionId);
+            } else {
+                updateSaveStatus("No assigned instructions.");
+            }
+        }
+
+        function updateRecentDrafts(data) {
+            const list = document.getElementById("recentDrafts");
+            list.innerHTML = "";
+            data.forEach(instr => {
+                const li = document.createElement("li");
+                li.innerHTML = `<a href="#" onclick="selectInstruction(${instr.draftingInstructionID})">${instr.title}</a>`;
+                list.appendChild(li);
+            });
+        }
+
+        function selectInstruction(id) {
+            const select = document.getElementById("instructionSelector");
+            select.value = id;
+            selectedInstructionId = id;
+            loadSavedDraft(id);
+        }
+
+        async function loadSavedDraft(instructionId) {
+            try {
+                const res = await fetch(`/api/drafts/ByInstruction/${instructionId}`, {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
+                    }
+                });
+                if (!res.ok) {
+                    editorInstance.setData("");
+                    updateSaveStatus("No draft yet.");
+                    return;
+                }
+                const result = await res.json();
+                editorInstance.setData(result.contentHtml);
+                updateSaveStatus("Last saved: " + new Date(result.lastModifiedAt || Date.now()).toLocaleString());
+            } catch {
+                updateSaveStatus("Error loading saved draft.");
+            }
+            startAutosave();
+        }
+
+        function updateSaveStatus(msg) {
+            const statusEl = document.getElementById("saveStatus");
+            statusEl.innerText = msg;
+        }
+
+        function startAutosave() {
+            if (autosaveTimer) clearInterval(autosaveTimer);
+            autosaveTimer = setInterval(() => {
+                saveDraft(true);
+            }, 60000);
+        }
+
+        async function saveDraft(silent = false) {
+            if (!selectedInstructionId) {
+                if (!silent) updateSaveStatus("No instruction selected.");
+                return;
+            }
+            const token = localStorage.getItem("jwtToken");
+            if (!token) {
+                updateSaveStatus("Not logged in. Please sign in again.");
+                return;
+            }
+
+            const content = editorInstance.getData();
+
+            const res = await fetch(`/api/drafts/Save`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    draftingInstructionID: parseInt(selectedInstructionId),
+                    htmlContent: content
+                })
+            });
+
+            if (res.ok && !silent) {
+                updateSaveStatus("Saved: " + new Date().toLocaleTimeString());
+            } else if (!silent) {
+                updateSaveStatus("Save failed.");
+            }
+        }
+
+        async function submitDraft() {
+            if (!selectedInstructionId) {
+                document.getElementById("draftMessage").innerText = "Please select an instruction.";
+                return;
+            }
+
+            if (!confirm("Are you sure you want to submit this draft? You won't be able to edit it afterward.")) {
+                return;
+            }
+
+            const content = editorInstance.getData();
+            const token = localStorage.getItem("jwtToken");
+            if (!token) {
+                document.getElementById("draftMessage").innerText = "Not logged in. Please sign in again.";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/drafts/Submit`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        draftingInstructionID: parseInt(selectedInstructionId),
+                        htmlContent: content
+                    })
+                });
+
+                const result = await response.json();
+                document.getElementById("draftMessage").innerText = result.message || "Draft submitted successfully!";
+            } catch (err) {
+                document.getElementById("draftMessage").innerText = "Draft submission failed. Please try again.";
+            }
+        }
+    </script>
+</body>
+</html>

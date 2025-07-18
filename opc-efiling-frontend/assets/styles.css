@@ -1,0 +1,35 @@
+/* assets/styles.css */
+
+/* Example: Change the primary button color to Lesotho-red (#dc3545) */
+.btn-primary {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #c5303e;
+  border-color: #b82a38;
+}
+
+/* Example: Add a custom font stack */
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Example: Make the hero section’s text a bit tighter on mobile */
+@media (max-width: 575.98px) {
+  header h1.display-4 {
+    font-size: 2rem;
+  }
+  header p.lead {
+    font-size: 1rem;
+  }
+}
+.hero {
+  /* old: background-image: url('/assets/hero-bg.jpg'); */
+  background: linear-gradient(135deg, #004080 0%, #001f3f 100%);
+  background-size: cover;
+  background-position: center;
+  /* …all other hero rules… */
+}

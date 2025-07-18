@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <title>OPC E-Filing System</title>
+
+    <!-- 1) BOOTSTRAP 5 CSS (via CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <!-- 2) CUSTOM STYLE SHEET -->
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- NAVBAR (unchanged) -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png"
+                     alt="Lesotho Coat of Arms"
+                     width="32"
+                     height="32"
+                     class="me-2" />
+                <span class="fw-bold">OPC E-Filing</span>
+            </a>
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- UPDATED HERO SECTION — Pure CSS gradient (no image) -->
+    <header class="header-bg text-white">
+        <div class="container py-5 text-center">
+            <h1 class="display-4 fw-bold">Welcome to the OPC E-Filing System</h1>
+            <p class="lead">
+                Modern, secure, and streamlined legislative management for Lesotho.
+            </p>
+            <a href="login.html" class="btn btn-light btn-lg mt-3">Get Started</a>
+        </div>
+    </header>
+
+    <!-- FEATURE CARDS (unchanged) -->
+    <section class="flex-grow-1 py-5">
+        <div class="container">
+            <div class="row gx-4 gy-4">
+                <div class="col-md-4 text-center">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-3 text-primary">🔒</div>
+                            <h5 class="card-title mt-3">Secure &amp; Encrypted</h5>
+                            <p class="card-text">
+                                All documents are encrypted at rest and in transit to keep
+                                legislative drafts safe.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 text-center">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-3 text-primary">⏱️</div>
+                            <h5 class="card-title mt-3">Real-Time Collaboration</h5>
+                            <p class="card-text">
+                                Draft and review legislation together, in real time, with version
+                                control and comments.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 text-center">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-3 text-primary">🔗</div>
+                            <h5 class="card-title mt-3">Easy Integration</h5>
+                            <p class="card-text">
+                                Seamlessly integrate with existing Ministry, Attorney General,
+                                and Printing Office systems.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-light text-center py-4 mt-auto">
+        <div class="container">
+            <p class="mb-1">© 2025 Office of Parliamentary Counsel, Lesotho</p>
+            <small>All rights reserved.</small>
+        </div>
+    </footer>
+
+    <!-- BOOTSTRAP 5 JS (via CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

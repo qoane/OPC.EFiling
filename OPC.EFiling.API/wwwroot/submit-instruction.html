@@ -1,0 +1,447 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>OPC E-Filing — Submit Instruction</title>
+
+    <!-- 1) BOOTSTRAP 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <!-- 2) FONT AWESOME (icons) -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-pM2eEdx..."
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+
+    <!-- 3) YOUR EXISTING STYLE.CSS (for variables & animations) -->
+    <link rel="stylesheet" href="/css/style.css" />
+
+    <style>
+        /* ─── Page Background ───────────────────────────────────────────────────────── */
+        body {
+            background: linear-gradient( 135deg, var(--color-primary) 0%, var(--color-secondary) 100% );
+            min-height: 100vh;
+            color: var(--color-text);
+            font-family: var(--font-sans);
+            padding-top: calc(var(--header-height) + 1rem);
+        }
+
+        /* ─── Navbar Overrides ───────────────────────────────────────────────────────── */
+        .navbar {
+            background: var(--color-card-bg);
+        }
+
+        .navbar-brand span {
+            color: var(--color-primary);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .navbar .nav-link {
+            color: var(--color-primary);
+            font-weight: 500;
+            transition: color var(--anim-fast);
+        }
+
+            .navbar .nav-link:hover {
+                color: var(--color-secondary);
+            }
+
+        /* ─── Form Card ──────────────────────────────────────────────────────────────── */
+        .form-card {
+            background-color: var(--color-card-bg);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: fadeIn var(--anim-medium) ease-in-out;
+        }
+
+        .form-card-header {
+            background: linear-gradient( 90deg, var(--color-primary), var(--color-secondary) );
+            color: var(--color-text-light);
+            padding: 1.5rem 2rem;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .form-card-body {
+            padding: 2rem;
+        }
+
+        /* ─── Input & Label Styling ─────────────────────────────────────────────────── */
+        .form-label {
+            font-weight: 500;
+            color: var(--color-primary);
+        }
+
+        .form-control {
+            border: 2px solid var(--color-border);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: border-color var(--anim-fast), box-shadow var(--anim-fast);
+        }
+
+            .form-control:focus {
+                border-color: var(--color-secondary);
+                box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.25);
+                outline: none;
+            }
+
+        /* ─── Submit Button ─────────────────────────────────────────────────────────── */
+        .btn-submit {
+            background: var(--color-accent);
+            color: var(--color-text);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            transition: transform var(--anim-fast), box-shadow var(--anim-fast);
+        }
+
+            .btn-submit:hover {
+                background: var(--color-secondary);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                color: var(--color-text-light);
+            }
+
+        /* ─── File Input Styling ─────────────────────────────────────────────────────── */
+        .form-text {
+            font-size: 0.875rem;
+            color: var(--color-text);
+        }
+
+        /* ─── Footer ─────────────────────────────────────────────────────────────────── */
+        footer {
+            background: var(--color-bg-dark);
+            color: var(--color-text-light);
+            padding: 1rem 0;
+        }
+
+            footer small {
+                color: var(--color-text-light);
+            }
+
+        /* ─── Responsive Adjustments ─────────────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .form-card {
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ─── NAVBAR ───────────────────────────────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png"
+                     alt="Lesotho Coat of Arms"
+                     width="32"
+                     height="32"
+                     class="me-2" />
+                <span>OPC E-Filing</span>
+            </a>
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavSubmit"
+                    aria-controls="navbarNavSubmit"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavSubmit">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="submit-instruction.html">
+                            <i class="fas fa-file-upload"></i> Submit Instruction
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutLinkSubmit">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── FORM CARD ──────────────────────────────────────────────────────────────────── -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="form-card mt-5 mb-5">
+                    <div class="form-card-header">
+                        <i class="fas fa-pencil-alt me-2"></i>Submit New Instruction
+                    </div>
+                    <div class="form-card-body">
+                        <form id="instructionForm" enctype="multipart/form-data" novalidate>
+                            <!-- Title -->
+                            <div class="mb-4">
+                                <label for="titleInput" class="form-label"><i class="fas fa-heading me-2"></i>Title</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="titleInput"
+                                       name="Title"
+                                       placeholder="Enter a concise title"
+                                       required />
+                                <div class="invalid-feedback">Title is required.</div>
+                            </div>
+
+                            <!-- Description (Instruction Text) -->
+                            <div class="mb-4">
+                                <label for="descInput" class="form-label"><i class="fas fa-align-left me-2"></i>Instruction Text</label>
+                                <textarea class="form-control"
+                                          id="descInput"
+                                          name="Description"
+                                          rows="5"
+                                          placeholder="Type the detailed drafting instruction here…"
+                                          required></textarea>
+                                <div class="invalid-feedback">Instruction text is required.</div>
+                            </div>
+
+                            <!-- Department ID and Assigned Drafter ID (side by side) -->
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="deptInput" class="form-label"><i class="fas fa-building me-2"></i>Department ID</label>
+                                    <input type="number"
+                                           class="form-control"
+                                           id="deptInput"
+                                           name="DepartmentID"
+                                           placeholder="e.g. 12"
+                                           required />
+                                    <div class="invalid-feedback">Department ID is required.</div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label for="drafterInput" class="form-label"><i class="fas fa-user-tie me-2"></i>Assigned Drafter ID</label>
+                                    <input type="number"
+                                           class="form-control"
+                                           id="drafterInput"
+                                           name="AssignedDrafterID"
+                                           placeholder="e.g. 7"
+                                           required />
+                                    <div class="invalid-feedback">
+                                        Assigned Drafter ID is required.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status and Priority (side by side) -->
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="statusInput" class="form-label"><i class="fas fa-info-circle me-2"></i>Status</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="statusInput"
+                                           name="Status"
+                                           placeholder="e.g. Submitted, InReview" />
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label for="priorityInput" class="form-label"><i class="fas fa-exclamation-circle me-2"></i>Priority</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="priorityInput"
+                                           name="Priority"
+                                           placeholder="e.g. High, Medium, Low" />
+                                </div>
+                            </div>
+
+                            <!-- Received Date -->
+                            <div class="mb-4">
+                                <label for="receivedInput" class="form-label"><i class="fas fa-calendar-day me-2"></i>Received Date</label>
+                                <input type="date"
+                                       class="form-control"
+                                       id="receivedInput"
+                                       name="ReceivedDate"
+                                       required />
+                                <div class="invalid-feedback">Received Date is required.</div>
+                            </div>
+
+                            <!-- File Upload -->
+                            <div class="mb-4">
+                                <label for="filesInput" class="form-label"><i class="fas fa-paperclip me-2"></i>Attachments</label>
+                                <input type="file"
+                                       class="form-control"
+                                       id="filesInput"
+                                       name="Files"
+                                       multiple />
+                                <div class="form-text">
+                                    You can select multiple files (PDF, DOCX, etc.).
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn-submit">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Instruction
+                                </button>
+                            </div>
+
+                            <!-- Feedback (success or error) -->
+                            <div id="submitFeedback" class="mt-4"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── LOGOUT CONFIRMATION MODAL ─────────────────────────────────────────────────────────── -->
+    <div class="modal fade"
+         id="logoutModalSubmit"
+         tabindex="-1"
+         aria-labelledby="logoutModalLabelSubmit"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabelSubmit">
+                        Confirm Logout
+                    </h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Are you sure you want to log out?</div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button"
+                            class="btn btn-danger"
+                            id="confirmLogoutSubmit">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── FOOTER ──────────────────────────────────────────────────────────────────────────────── -->
+    <footer>
+        <div class="container text-center">
+            <p class="mb-1">© 2025 Office of Parliamentary Counsel, Lesotho</p>
+            <small>All rights reserved.</small>
+        </div>
+    </footer>
+    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── BOOTSTRAP 5 JS (bundled) ────────────────────────────────────────────────────────────── -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1) Redirect to login if no JWT
+            const token = localStorage.getItem("jwtToken");
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            // 2) Logout logic
+            const logoutLink = document.getElementById("logoutLinkSubmit");
+            const logoutModal = new bootstrap.Modal(
+                document.getElementById("logoutModalSubmit")
+            );
+            logoutLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                logoutModal.show();
+            });
+            document
+                .getElementById("confirmLogoutSubmit")
+                .addEventListener("click", () => {
+                    localStorage.removeItem("jwtToken");
+                    window.location.href = "login.html";
+                });
+
+            // 3) Form submission
+            const form = document.getElementById("instructionForm");
+            const feedbackDiv = document.getElementById("submitFeedback");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!form.checkValidity()) {
+                    form.classList.add("was-validated");
+                    return;
+                }
+
+                // Build FormData matching CreateInstructionDto
+                const formData = new FormData();
+                formData.append("Title", document.getElementById("titleInput").value);
+                formData.append(
+                    "Description",
+                    document.getElementById("descInput").value
+                );
+                formData.append(
+                    "DepartmentID",
+                    document.getElementById("deptInput").value
+                );
+                formData.append(
+                    "AssignedDrafterID",
+                    document.getElementById("drafterInput").value
+                );
+                formData.append("Status", document.getElementById("statusInput").value);
+                formData.append(
+                    "Priority",
+                    document.getElementById("priorityInput").value
+                );
+                formData.append(
+                    "ReceivedDate",
+                    document.getElementById("receivedInput").value
+                );
+
+                const filesInput = document.getElementById("filesInput");
+                for (let i = 0; i < filesInput.files.length; i++) {
+                    formData.append("Files", filesInput.files[i]);
+                }
+
+                try {
+                    const response = await fetch("/api/DraftingInstructions", {
+                        method: "POST",
+                        headers: {
+                            Authorization: "Bearer " + token
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const err = await response.text();
+                        feedbackDiv.innerHTML = `<div class="alert alert-danger">Error: ${err}</div>`;
+                        return;
+                    }
+
+                    const result = await response.json();
+                    feedbackDiv.innerHTML = `<div class="alert alert-success">
+                Instruction submitted (ID: ${result.draftingInstructionID}).<br/>
+                <a href="dashboard.html">Back to Dashboard</a>
+              </div>`;
+                    form.reset();
+                    form.classList.remove("was-validated");
+                } catch (ex) {
+                    feedbackDiv.innerHTML = `<div class="alert alert-danger">
+                Unexpected error. Please try again.
+              </div>`;
+                    console.error(ex);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

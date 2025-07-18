@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>OPC E-Filing — Login</title>
+
+    <!-- 1) BOOTSTRAP 5 CSS (via CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <!-- 2) FONT AWESOME (for icons) -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-pM2eEdx..."
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+
+    <!-- 3) OUR REUSABLE STYLESHEET -->
+    <link rel="stylesheet" href="/css/style.css" />
+
+    <style>
+        /* Page-specific: full‐page gradient + card positioning */
+        body {
+            background: linear-gradient(135deg, #004080 0%, #001f3f 100%);
+            /* Add a little top padding so the card isn't hidden under the navbar */
+            padding-top: 70px; /* ≈ the height of your navbar (60px) + small buffer */
+        }
+
+        .login-card {
+            max-width: 400px;
+            margin: auto;
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            background-color: var(--color-card-bg);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            animation: slideInLeft var(--anim-medium) ease;
+        }
+
+        .login-header {
+            background: var(--color-primary);
+            color: var(--color-text-light);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+            .login-header h2 {
+                margin: 0;
+                font-size: 1.75rem;
+                letter-spacing: 0.05rem;
+            }
+
+        .login-body {
+            padding: 2rem;
+        }
+
+            .login-body .form-group {
+                margin-bottom: 1.25rem;
+            }
+
+            .login-body label {
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                display: block;
+                color: var(--color-text);
+            }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+            .login-footer a {
+                color: var(--color-secondary);
+                font-size: 0.9rem;
+            }
+
+                .login-footer a:hover {
+                    color: var(--color-accent);
+                }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- ─── NAVBAR (swapped to match index.html) ──────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png"
+                     alt="Lesotho Coat of Arms"
+                     width="32"
+                     height="32"
+                     class="me-2" />
+                <span class="fw-bold">OPC E-Filing</span>
+            </a>
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavLogin"
+                    aria-controls="navbarNavLogin"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavLogin">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- ────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── LOGIN CARD ──────────────────────────────────────────────────────────────────── -->
+    <div class="login-card rounded shadow-lg">
+        <div class="login-header">
+            <h2>Login to Your Account</h2>
+        </div>
+        <div class="login-body">
+            <form id="loginForm" novalidate>
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="inputEmail">Email Address</label>
+                    <input type="email"
+                           class="form-control"
+                           id="inputEmail"
+                           placeholder="name@example.com"
+                           required />
+                    <div class="invalid-feedback">
+                        Please enter a valid email address.
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="inputPassword">Password</label>
+                    <input type="password"
+                           class="form-control"
+                           id="inputPassword"
+                           placeholder="Enter your password"
+                           required />
+                    <div class="invalid-feedback">
+                        Please enter your password.
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid mt-4">
+                    <button id="btnLogin" class="btn btn-secondary btn-block" type="submit">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
+            </form>
+
+            <div class="login-footer">
+                <a href="#">Forgot password?</a>
+            </div>
+        </div>
+    </div>
+    <!-- ────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── FOOTER (identical to index footer) ──────────────────────────────────────────── -->
+    <footer class="bg-light text-center py-4 mt-auto">
+        <div class="container">
+            <p class="mb-1">© 2025 Office of Parliamentary Counsel, Lesotho</p>
+            <small>All rights reserved.</small>
+        </div>
+    </footer>
+    <!-- ────────────────────────────────────────────────────────────────────────────────── -->
+    <!-- ─── BOOTSTRAP 5 JS (via CDN) ──────────────────────────────────────────────────────── -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ─── LOGIN SCRIPT (unchanged) ──────────────────────────────────────────────────────── -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
+                }
+                event.preventDefault();
+                sendLoginRequest();
+            });
+
+            async function sendLoginRequest() {
+                const email = document.getElementById('inputEmail').value.trim();
+                const password = document.getElementById('inputPassword').value.trim();
+                if (!email || !password) {
+                    alert('Both email and password are required.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/Auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: email, password: password })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        alert('Login failed: ' + errorText);
+                        return;
+                    }
+
+                    const data = await response.json();
+                    localStorage.setItem('jwtToken', data.token);
+                    window.location.href = 'dashboard.html';
+                } catch (err) {
+                    console.error(err);
+                    alert('An unexpected error occurred during login.');
+                }
+            }
+        });
+    </script>
+    <!-- ────────────────────────────────────────────────────────────────────────────────── -->
+</body>
+</html>
