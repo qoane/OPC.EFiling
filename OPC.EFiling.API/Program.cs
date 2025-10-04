@@ -1,11 +1,12 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using OPC.EFiling.Infrastructure.Data;
-using OPC.EFiling.Domain.Entities;
 using OPC.EFiling.Application.Services;
+using OPC.EFiling.Domain.Entities;
+using OPC.EFiling.Infrastructure.Data;
+using OPC.EFiling.Infrastructure.Data.Seeds;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -126,6 +127,7 @@ app.UseCors("AllowFrontend");
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    await DataSeeder.SeedAsync(services);
     var roleManager = services.GetRequiredService<RoleManager<Role>>();
     var userManager = services.GetRequiredService<UserManager<User>>();
     await DbInitializer.SeedRolesAsync(roleManager);
