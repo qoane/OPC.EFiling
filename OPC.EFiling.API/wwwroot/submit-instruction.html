@@ -2,446 +2,784 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>OPC E-Filing — Submit Instruction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OPC E‑Filing — Submit Instruction</title>
 
-    <!-- 1) BOOTSTRAP 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
-          rel="stylesheet" />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- 2) FONT AWESOME (icons) -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          integrity="sha512-pM2eEdx..."
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer" />
-
-    <!-- 3) YOUR EXISTING STYLE.CSS (for variables & animations) -->
-    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 
     <style>
-        /* ─── Page Background ───────────────────────────────────────────────────────── */
+        :root {
+            --les-blue: #0c4ad4;
+            --les-green: #1f8a43;
+            --ink-900: #0b1020;
+            --ink-700: #1f2a44;
+            --ink-500: #4b587a;
+            --nude-10: #fdfcfb;
+            --nude-25: #fbf8f5;
+            --nude-50: #f7f3ef;
+            --glass-bg: 24,36,66;
+            --glass-alpha: .6;
+            --radius-2xl: 22px;
+            --shadow-md: 0 10px 30px rgba(11,16,32,.15);
+            --step-size: 34px;
+            --step-gap: 16px;
+            --step-line: #e5e7eb;
+            --step-active: var(--les-blue);
+        }
+
+        html, body {
+            height: 100%
+        }
+
         body {
-            background: linear-gradient( 135deg, var(--color-primary) 0%, var(--color-secondary) 100% );
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--ink-700);
+            background: radial-gradient(1200px 800px at 10% -10%, var(--nude-10), var(--nude-25)), radial-gradient(1000px 700px at 110% 10%, var(--nude-50), var(--nude-10));
+            overflow-x: hidden;
+            padding-top: 72px;
             min-height: 100vh;
-            color: var(--color-text);
-            font-family: var(--font-sans);
-            padding-top: calc(var(--header-height) + 1rem);
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ─── Navbar Overrides ───────────────────────────────────────────────────────── */
-        .navbar {
-            background: var(--color-card-bg);
+        /* Flag bar */
+        .flag-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1040;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06)
         }
 
-        .navbar-brand span {
-            color: var(--color-primary);
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        .navbar .nav-link {
-            color: var(--color-primary);
-            font-weight: 500;
-            transition: color var(--anim-fast);
-        }
-
-            .navbar .nav-link:hover {
-                color: var(--color-secondary);
+            .flag-bar .bar {
+                height: 6px
             }
 
-        /* ─── Form Card ──────────────────────────────────────────────────────────────── */
+        .flag-blue {
+            background: var(--les-blue)
+        }
+
+        .flag-white {
+            background: #fff
+        }
+
+        .flag-green {
+            background: var(--les-green)
+        }
+
+        /* Orbs */
+        .orb {
+            position: absolute;
+            filter: blur(40px);
+            opacity: .28;
+            z-index: 0
+        }
+
+            .orb.blue {
+                background: radial-gradient( circle at 40% 40%, #2e6cff, rgba(46,108,255,0) 60% );
+            }
+
+            .orb.green {
+                background: radial-gradient( circle at 60% 60%, #3ecf6d, rgba(62,207,109,0) 60% );
+            }
+
+            .orb.nude {
+                background: radial-gradient( circle at 50% 50%, #ffe8d8, rgba(255,232,216,0) 60% );
+            }
+
+            .orb.size-lg {
+                width: 520px;
+                height: 520px;
+                border-radius: 50%
+            }
+
+            .orb.size-md {
+                width: 360px;
+                height: 360px;
+                border-radius: 50%
+            }
+
+            .orb.size-sm {
+                width: 220px;
+                height: 220px;
+                border-radius: 50%
+            }
+
+        @keyframes floaty {
+            0% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-18px)
+            }
+
+            100% {
+                transform: translateY(0)
+            }
+        }
+
+        .animate-float {
+            animation: floaty 10s ease-in-out infinite
+        }
+
+        /* Glass */
+        .glass {
+            background: rgba(var(--glass-bg),var(--glass-alpha));
+            backdrop-filter: blur(14px) saturate(130%);
+            -webkit-backdrop-filter: blur(14px) saturate(130%);
+            border: 1px solid rgba(255,255,255,.25);
+            box-shadow: var(--shadow-md);
+            border-radius: var(--radius-2xl)
+        }
+
+        /* Navbar */
+        .navbar.glassy {
+            background: rgba(255,255,255,.65) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,.06)
+        }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-weight: 800;
+            color: var(--ink-900)
+        }
+
+            .brand-mark img {
+                width: 32px;
+                height: 32px
+            }
+
+        /* Header ribbon */
+        .page-header {
+            position: relative;
+            padding: 48px 0 24px
+        }
+
+            .page-header .halo {
+                position: absolute;
+                inset: -60px -40px -30px -40px;
+                pointer-events: none;
+                z-index: 0;
+                background: radial-gradient(900px 500px at 45% -10%, rgba(12,74,212,.18), rgba(12,74,212,0) 60%), radial-gradient(800px 480px at 80% 10%, rgba(31,138,67,.16), rgba(31,138,67,0) 60%);
+            }
+
+            .page-header .inner {
+                position: relative;
+                z-index: 1
+            }
+
+        .btn-flag {
+            background: linear-gradient(90deg, var(--les-blue), #1a66ff 48%, #fff 49%, #fff 51%, var(--les-green) 52%, #31a95a 100%);
+            color: #0b1020;
+            border: none
+        }
+
+        .btn-ghost {
+            background: #fff;
+            border: 1px solid rgba(11,16,32,.12)
+        }
+
+        /* Wizard stepper */
+        .wizard {
+            max-width: 1024px;
+            margin-inline: auto
+        }
+
+        .stepper {
+            position: relative
+        }
+
+            .stepper .line {
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: calc(var(--step-size)/2);
+                height: 2px;
+                background: var(--step-line)
+            }
+
+            .stepper ol {
+                position: relative;
+                z-index: 1;
+                display: flex;
+                justify-content: space-between;
+                gap: var(--step-gap);
+                list-style: none;
+                padding: 0;
+                margin: 0
+            }
+
+            .stepper li {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                width: 100%
+            }
+
+            .stepper .dot {
+                width: var(--step-size);
+                height: var(--step-size);
+                border-radius: 50%;
+                display: grid;
+                place-items: center;
+                font-weight: 700;
+                background: linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,.05));
+                border: 1px solid rgba(255,255,255,.5)
+            }
+
+            .stepper [aria-current="step"] .dot {
+                outline: 3px solid rgba(12,74,212,.25);
+                box-shadow: 0 0 0 4px rgba(12,74,212,.08)
+            }
+
+            .stepper [data-complete="true"] .dot {
+                background: linear-gradient(135deg, rgba(12,74,212,.2), rgba(31,138,67,.2));
+                color: #0b1020
+            }
+
+            .stepper .label {
+                margin-top: .5rem;
+                font-size: .9rem
+            }
+
+        /* Form */
         .form-card {
-            background-color: var(--color-card-bg);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            animation: fadeIn var(--anim-medium) ease-in-out;
+            max-width: 960px;
+            margin-inline: auto
         }
 
-        .form-card-header {
-            background: linear-gradient( 90deg, var(--color-primary), var(--color-secondary) );
-            color: var(--color-text-light);
-            padding: 1.5rem 2rem;
-            font-size: 1.75rem;
-            font-weight: 600;
+        .form-section {
+            padding: 22px
         }
 
-        .form-card-body {
-            padding: 2rem;
-        }
-
-        /* ─── Input & Label Styling ─────────────────────────────────────────────────── */
         .form-label {
-            font-weight: 500;
-            color: var(--color-primary);
+            font-weight: 600
         }
 
-        .form-control {
-            border: 2px solid var(--color-border);
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            transition: border-color var(--anim-fast), box-shadow var(--anim-fast);
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: .75rem 1rem
         }
 
-            .form-control:focus {
-                border-color: var(--color-secondary);
-                box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.25);
-                outline: none;
+        .input-group-text {
+            border-radius: 12px
+        }
+
+        .dropzone {
+            border: 1px dashed rgba(0,0,0,.2);
+            border-radius: 14px;
+            padding: 18px;
+            background: #fff
+        }
+
+            .dropzone.drag {
+                background: linear-gradient(180deg, rgba(12,74,212,.05), rgba(31,138,67,.05));
+                border-color: var(--les-blue)
             }
 
-        /* ─── Submit Button ─────────────────────────────────────────────────────────── */
-        .btn-submit {
-            background: var(--color-accent);
-            color: var(--color-text);
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 0.5rem;
-            transition: transform var(--anim-fast), box-shadow var(--anim-fast);
+        .chip {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,.06);
+            padding: .35rem .6rem;
+            border-radius: 999px;
+            font-size: .85rem;
+            font-weight: 600
         }
 
-            .btn-submit:hover {
-                background: var(--color-secondary);
-                transform: translateY(-2px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-                color: var(--color-text-light);
-            }
-
-        /* ─── File Input Styling ─────────────────────────────────────────────────────── */
-        .form-text {
-            font-size: 0.875rem;
-            color: var(--color-text);
+        .review li {
+            margin-bottom: .3rem
         }
 
-        /* ─── Footer ─────────────────────────────────────────────────────────────────── */
         footer {
-            background: var(--color-bg-dark);
-            color: var(--color-text-light);
-            padding: 1rem 0;
-        }
-
-            footer small {
-                color: var(--color-text-light);
-            }
-
-        /* ─── Responsive Adjustments ─────────────────────────────────────────────────── */
-        @media (max-width: 768px) {
-            .form-card {
-                margin: 1rem;
-            }
+            background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.9))
         }
     </style>
 </head>
-
 <body>
-    <!-- ─── NAVBAR ───────────────────────────────────────────────────────────────────── -->
-    <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+    <!-- Flag bar -->
+    <div class="flag-bar">
+        <div class="bar flag-blue"></div>
+        <div class="bar flag-white"></div>
+        <div class="bar flag-green"></div>
+    </div>
+
+    <!-- Orbs -->
+    <div class="orb blue size-lg animate-float" style="top:-120px; left:-120px"></div>
+    <div class="orb green size-md animate-float" style="bottom:10%; right:-80px; animation-delay:.6s"></div>
+    <div class="orb nude size-sm animate-float" style="top:40%; left:10%"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg glassy fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="index.html">
-                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png"
-                     alt="Lesotho Coat of Arms"
-                     width="32"
-                     height="32"
-                     class="me-2" />
-                <span>OPC E-Filing</span>
+            <a class="navbar-brand brand-mark" href="dashboard.html">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" alt="Lesotho Coat of Arms">
+                <span>OPC <span class="text-primary">E‑Filing</span></span>
             </a>
-            <button class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNavSubmit"
-                    aria-controls="navbarNavSubmit"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavSubmit">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="submit-instruction.html">
-                            <i class="fas fa-file-upload"></i> Submit Instruction
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="logoutLinkSubmit">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
-                    </li>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="submit-instruction.html"><i class="bi bi-upload me-1"></i>Submit Instruction</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    <!-- ──────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── FORM CARD ──────────────────────────────────────────────────────────────────── -->
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
-                <div class="form-card mt-5 mb-5">
-                    <div class="form-card-header">
-                        <i class="fas fa-pencil-alt me-2"></i>Submit New Instruction
-                    </div>
-                    <div class="form-card-body">
-                        <form id="instructionForm" enctype="multipart/form-data" novalidate>
-                            <!-- Title -->
-                            <div class="mb-4">
-                                <label for="titleInput" class="form-label"><i class="fas fa-heading me-2"></i>Title</label>
-                                <input type="text"
-                                       class="form-control"
-                                       id="titleInput"
-                                       name="Title"
-                                       placeholder="Enter a concise title"
-                                       required />
-                                <div class="invalid-feedback">Title is required.</div>
-                            </div>
 
-                            <!-- Description (Instruction Text) -->
-                            <div class="mb-4">
-                                <label for="descInput" class="form-label"><i class="fas fa-align-left me-2"></i>Instruction Text</label>
-                                <textarea class="form-control"
-                                          id="descInput"
-                                          name="Description"
-                                          rows="5"
-                                          placeholder="Type the detailed drafting instruction here…"
-                                          required></textarea>
-                                <div class="invalid-feedback">Instruction text is required.</div>
-                            </div>
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+        <div class="halo"></div>
+        <div class="inner container" data-aos="fade-up">
+            <h1 class="fw-bolder mb-2">Submit New Instruction</h1>
+            <p class="text-muted mb-0">Follow the steps to provide details, routing, metadata, and attachments.</p>
+        </div>
+    </header>
 
-                            <!-- Department ID and Assigned Drafter ID (side by side) -->
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <label for="deptInput" class="form-label"><i class="fas fa-building me-2"></i>Department ID</label>
-                                    <input type="number"
-                                           class="form-control"
-                                           id="deptInput"
-                                           name="DepartmentID"
-                                           placeholder="e.g. 12"
-                                           required />
-                                    <div class="invalid-feedback">Department ID is required.</div>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <label for="drafterInput" class="form-label"><i class="fas fa-user-tie me-2"></i>Assigned Drafter ID</label>
-                                    <input type="number"
-                                           class="form-control"
-                                           id="drafterInput"
-                                           name="AssignedDrafterID"
-                                           placeholder="e.g. 7"
-                                           required />
-                                    <div class="invalid-feedback">
-                                        Assigned Drafter ID is required.
-                                    </div>
-                                </div>
-                            </div>
+    <!-- WIZARD / STEPPER -->
+    <section class="wizard container mb-3" role="navigation" aria-label="Form progress">
+        <div class="stepper glass p-3">
+            <div class="line"></div>
+            <ol class="m-0">
+                <li id="stepTab0" aria-current="step">
+                    <div class="dot">1</div>
+                    <div class="label">Details</div>
+                </li>
+                <li id="stepTab1">
+                    <div class="dot">2</div>
+                    <div class="label">Routing</div>
+                </li>
+                <li id="stepTab2">
+                    <div class="dot">3</div>
+                    <div class="label">Meta</div>
+                </li>
+                <li id="stepTab3">
+                    <div class="dot">4</div>
+                    <div class="label">Attachments</div>
+                </li>
+                <li id="stepTab4">
+                    <div class="dot">5</div>
+                    <div class="label">Review</div>
+                </li>
+            </ol>
+        </div>
+    </section>
 
-                            <!-- Status and Priority (side by side) -->
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <label for="statusInput" class="form-label"><i class="fas fa-info-circle me-2"></i>Status</label>
-                                    <input type="text"
-                                           class="form-control"
-                                           id="statusInput"
-                                           name="Status"
-                                           placeholder="e.g. Submitted, InReview" />
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <label for="priorityInput" class="form-label"><i class="fas fa-exclamation-circle me-2"></i>Priority</label>
-                                    <input type="text"
-                                           class="form-control"
-                                           id="priorityInput"
-                                           name="Priority"
-                                           placeholder="e.g. High, Medium, Low" />
-                                </div>
+    <!-- FORM CARD (MULTISTEP) -->
+    <main class="container mb-5">
+        <div class="glass form-card" data-aos="zoom-in">
+            <div class="form-section">
+                <form id="instructionForm" enctype="multipart/form-data" novalidate>
+                    <!-- STEP 0: Details -->
+                    <section class="step" data-step="0">
+                        <div class="mb-3">
+                            <label for="titleInput" class="form-label"><i class="bi bi-type me-2"></i>Title</label>
+                            <input type="text" class="form-control" id="titleInput" name="Title" placeholder="Enter a concise title" required />
+                            <div class="invalid-feedback">Title is required.</div>
+                        </div>
+                        <div>
+                            <label for="descInput" class="form-label"><i class="bi bi-text-left me-2"></i>Instruction Text</label>
+                            <textarea class="form-control" id="descInput" name="Description" rows="6" placeholder="Type the detailed drafting instruction here…" required></textarea>
+                            <div class="d-flex justify-content-between small mt-1">
+                                <span class="text-muted">Minimum guidance only — final drafting occurs in the secure editor.</span>
+                                <span class="text-muted"><span id="descCount">0</span> / 2000</span>
                             </div>
+                            <div class="invalid-feedback">Instruction text is required.</div>
+                        </div>
+                    </section>
 
-                            <!-- Received Date -->
-                            <div class="mb-4">
-                                <label for="receivedInput" class="form-label"><i class="fas fa-calendar-day me-2"></i>Received Date</label>
-                                <input type="date"
-                                       class="form-control"
-                                       id="receivedInput"
-                                       name="ReceivedDate"
-                                       required />
+                    <!-- STEP 1: Routing -->
+                    <section class="step d-none" data-step="1">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="deptInput" class="form-label"><i class="bi bi-building me-2"></i>Department (Ministry)</label>
+                                <select id="deptInput" name="DepartmentID" class="form-select" required>
+                                    <option value="" selected disabled>Select a ministry…</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a ministry.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="drafterInput" class="form-label"><i class="bi bi-person-badge me-2"></i>Assigned Drafter</label>
+                                <select id="drafterInput" name="AssignedDrafterID" class="form-select" required>
+                                    <option value="" selected disabled>Select a drafter…</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a drafter.</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- STEP 2: Meta -->
+                    <section class="step d-none" data-step="2">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="statusInput" class="form-label"><i class="bi bi-info-circle me-2"></i>Status</label>
+                                <select id="statusInput" class="form-select" required>
+                                    <option value="" selected disabled>Select status…</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a status.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="priorityInput" class="form-label"><i class="bi bi-exclamation-circle me-2"></i>Priority</label>
+                                <select id="priorityInput" class="form-select" required>
+                                    <option value="" selected disabled>Select priority…</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a priority.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="receivedInput" class="form-label"><i class="bi bi-calendar-day me-2"></i>Received Date</label>
+                                <input type="date" class="form-control" id="receivedInput" name="ReceivedDate" required />
                                 <div class="invalid-feedback">Received Date is required.</div>
                             </div>
+                        </div>
+                    </section>
 
-                            <!-- File Upload -->
-                            <div class="mb-4">
-                                <label for="filesInput" class="form-label"><i class="fas fa-paperclip me-2"></i>Attachments</label>
-                                <input type="file"
-                                       class="form-control"
-                                       id="filesInput"
-                                       name="Files"
-                                       multiple />
-                                <div class="form-text">
-                                    You can select multiple files (PDF, DOCX, etc.).
+                    <!-- STEP 3: Attachments -->
+                    <section class="step d-none" data-step="3">
+                        <label class="form-label"><i class="bi bi-paperclip me-2"></i>Attachments</label>
+                        <div id="dropzone" class="dropzone">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="feature-icon" style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px;background:linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,.05)); border:1px solid rgba(255,255,255,.4)"><i class="bi bi-cloud-arrow-up"></i></span>
+                                    <div class="small">
+                                        <div class="fw-semibold">Drag & drop files</div>
+                                        <div class="text-muted">PDF, DOCX and more</div>
+                                    </div>
+                                </div>
+                                <label class="btn btn-sm btn-ghost mb-0">
+                                    <input type="file" id="filesInput" name="Files" multiple hidden />
+                                    Browse…
+                                </label>
+                            </div>
+                            <div id="fileChips" class="d-flex flex-wrap gap-2 mt-3"></div>
+                        </div>
+                    </section>
+
+                    <!-- STEP 4: Review -->
+                    <section class="step d-none" data-step="4">
+                        <div class="row g-4">
+                            <div class="col-12 col-lg-7">
+                                <div class="glass p-3">
+                                    <h6 class="fw-bold mb-2">Summary</h6>
+                                    <ul class="review list-unstyled mb-0" id="reviewList"></ul>
                                 </div>
                             </div>
-
-                            <!-- Submit Button -->
-                            <div class="d-grid">
-                                <button type="submit" class="btn-submit">
-                                    <i class="fas fa-paper-plane me-2"></i>Submit Instruction
-                                </button>
+                            <div class="col-12 col-lg-5">
+                                <div class="glass p-3">
+                                    <h6 class="fw-bold mb-2">Attachments</h6>
+                                    <div id="reviewFiles" class="d-flex flex-wrap gap-2"></div>
+                                </div>
                             </div>
+                        </div>
+                    </section>
 
-                            <!-- Feedback (success or error) -->
-                            <div id="submitFeedback" class="mt-4"></div>
-                        </form>
+                    <!-- Wizard controls -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-ghost" id="btnPrev" disabled><i class="bi bi-arrow-left me-1"></i> Back</button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-ghost" id="btnSaveDraft"><i class="bi bi-save me-1"></i> Save draft</button>
+                            <button type="button" class="btn btn-flag" id="btnNext">Next <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="submit" class="btn btn-flag d-none" id="btnSubmit"><span id="submitText">Submit Instruction</span></button>
+                        </div>
                     </div>
-                </div>
+
+                    <div class="col-12 mt-3" id="submitFeedback"></div>
+                </form>
             </div>
         </div>
-    </div>
-    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── LOGOUT CONFIRMATION MODAL ─────────────────────────────────────────────────────────── -->
-    <div class="modal fade"
-         id="logoutModalSubmit"
-         tabindex="-1"
-         aria-labelledby="logoutModalLabelSubmit"
-         aria-hidden="true">
+    </main>
+
+    <!-- LOGOUT MODAL -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content glass">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabelSubmit">
-                        Confirm Logout
-                    </h5>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">Are you sure you want to log out?</div>
                 <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-                    <button type="button"
-                            class="btn btn-danger"
-                            id="confirmLogoutSubmit">
-                        Logout
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmLogout">Logout</button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── FOOTER ──────────────────────────────────────────────────────────────────────────────── -->
-    <footer>
-        <div class="container text-center">
-            <p class="mb-1">© 2025 Office of Parliamentary Counsel, Lesotho</p>
-            <small>All rights reserved.</small>
+
+    <!-- FOOTER -->
+    <footer class="py-4 mt-auto">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" width="24" height="24" alt="Lesotho Coat of Arms">
+                    <span class="fw-bold">Office of Parliamentary Counsel</span>
+                </div>
+                <div class="small text-muted">© 2025 Government of Lesotho · All rights reserved</div>
+            </div>
         </div>
     </footer>
-    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── BOOTSTRAP 5 JS (bundled) ────────────────────────────────────────────────────────────── -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Lock expiry toast -->
+    <div id="lock-toast" style="display:none; position:fixed; top:20px; right:20px; background:#dc3545; color:white; padding:15px; border-radius:10px; z-index:9999; box-shadow:var(--shadow-md)">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> Your editing lock has expired. Please refresh to re‑acquire the lock.
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // 1) Redirect to login if no JWT
-            const token = localStorage.getItem("jwtToken");
-            if (!token) {
-                window.location.href = "login.html";
-                return;
+        AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 80 });
+
+        // --- Seed data (IDs + labels) ---
+        const DEPARTMENTS = [
+            { id: 201, name: "Prime Minister's Office" },
+            { id: 202, name: "Ministry of Law and Justice" },
+            { id: 203, name: "Ministry of Finance and Development Planning" },
+            { id: 204, name: "Ministry of Foreign Affairs and International Relations" },
+            { id: 205, name: "Ministry of Education and Training" },
+            { id: 206, name: "Ministry of Health" },
+            { id: 207, name: "Ministry of Agriculture, Food Security and Nutrition" },
+            { id: 208, name: "Ministry of Natural Resources" },
+            { id: 209, name: "Ministry of Public Works and Transport" },
+            { id: 210, name: "Ministry of Local Government, Chieftainship, Home Affairs and Police" },
+            { id: 211, name: "Ministry of Information, Communications, Science, Technology and Innovation" },
+            { id: 212, name: "Ministry of Trade, Industry and Small Business" },
+            { id: 213, name: "Ministry of Gender, Youth and Social Development" },
+            { id: 214, name: "Ministry of Public Service" },
+            { id: 215, name: "Ministry of Energy" },
+            { id: 216, name: "Ministry of Tourism, Sports, Arts and Culture" },
+            { id: 217, name: "Ministry of Labour and Employment" },
+            { id: 218, name: "Ministry of Environment and Forestry" }
+        ];
+
+        const DRAFTERS = [
+            { id: 801, name: 'Qoane Seitlheko' },
+            { id: 802, name: 'TSepo Kaibe' }
+        ];
+
+        const STATUSES = [
+            { id: 1, name: 'Submitted' },
+            { id: 2, name: 'Logged' },
+            { id: 3, name: 'Assigned' },
+            { id: 4, name: 'In Drafting' },
+            { id: 5, name: 'Under Review' },
+            { id: 6, name: 'Returned' },
+            { id: 7, name: 'Finalized' },
+            { id: 8, name: 'Archived' }
+        ];
+
+        const PRIORITIES = [
+            { id: 1, name: 'Urgent' },
+            { id: 2, name: 'High' },
+            { id: 3, name: 'Medium' },
+            { id: 4, name: 'Low' },
+            { id: 5, name: 'Deferred' }
+        ];
+
+        // JWT gate
+        const token = localStorage.getItem('jwtToken');
+        if (!token) { window.location.href = 'login.html'; }
+
+        // Navbar logout
+        const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+        document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); logoutModal.show(); });
+        document.getElementById('confirmLogout').addEventListener('click', () => { localStorage.removeItem('jwtToken'); window.location.href = 'login.html'; });
+
+        // Textarea counter
+        const desc = document.getElementById('descInput');
+        const descCount = document.getElementById('descCount');
+        const MAX = 2000; desc.addEventListener('input', () => { descCount.textContent = Math.min(desc.value.length, MAX); if (desc.value.length > MAX) { desc.value = desc.value.slice(0, MAX); } });
+
+        // Populate selects
+        function fillSelect(selectEl, items) {
+            items.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = String(o.id);
+                opt.textContent = o.name;
+                opt.dataset.label = o.name;
+                selectEl.appendChild(opt);
+            });
+        }
+        fillSelect(document.getElementById('deptInput'), DEPARTMENTS);
+        fillSelect(document.getElementById('drafterInput'), DRAFTERS);
+        fillSelect(document.getElementById('statusInput'), STATUSES);
+        fillSelect(document.getElementById('priorityInput'), PRIORITIES);
+
+        // Dropzone helpers
+        const dz = document.getElementById('dropzone');
+        const fileInput = document.getElementById('filesInput');
+        const chips = document.getElementById('fileChips');
+
+        function renderChips() {
+            chips.innerHTML = '';
+            const files = fileInput.files;
+            for (let i = 0; i < files.length; i++) {
+                const s = document.createElement('span'); s.className = 'chip'; s.textContent = files[i].name;
+                chips.appendChild(s);
             }
+        }
+        ['dragenter', 'dragover'].forEach(evt => dz.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.add('drag'); }));
+        ['dragleave', 'drop'].forEach(evt => dz.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.remove('drag'); }));
+        dz.addEventListener('drop', (e) => { if (e.dataTransfer?.files?.length) { fileInput.files = e.dataTransfer.files; renderChips(); } });
+        fileInput.addEventListener('change', renderChips);
 
-            // 2) Logout logic
-            const logoutLink = document.getElementById("logoutLinkSubmit");
-            const logoutModal = new bootstrap.Modal(
-                document.getElementById("logoutModalSubmit")
-            );
-            logoutLink.addEventListener("click", (e) => {
-                e.preventDefault();
-                logoutModal.show();
+        // Wizard state
+        let currentStep = 0; const totalSteps = 5;
+        const tabs = [...document.querySelectorAll('.stepper li')];
+        const sections = [...document.querySelectorAll('.step')];
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const btnSubmit = document.getElementById('btnSubmit');
+
+        function setStep(n) {
+            currentStep = Math.max(0, Math.min(n, totalSteps - 1));
+            sections.forEach((s, i) => { s.classList.toggle('d-none', i !== currentStep); });
+            tabs.forEach((t, i) => {
+                t.toggleAttribute('aria-current', i === currentStep ? 'step' : false);
+                t.setAttribute('data-complete', i < currentStep);
             });
-            document
-                .getElementById("confirmLogoutSubmit")
-                .addEventListener("click", () => {
-                    localStorage.removeItem("jwtToken");
-                    window.location.href = "login.html";
-                });
+            btnPrev.disabled = currentStep === 0;
+            btnNext.classList.toggle('d-none', currentStep === totalSteps - 1);
+            btnSubmit.classList.toggle('d-none', currentStep !== totalSteps - 1);
+            if (currentStep === totalSteps - 1) { buildReview(); }
+        }
 
-            // 3) Form submission
-            const form = document.getElementById("instructionForm");
-            const feedbackDiv = document.getElementById("submitFeedback");
+        function validateStep() {
+            // Basic HTML5 validity within visible step
+            const stepEl = sections[currentStep];
+            const inputs = stepEl.querySelectorAll('input, textarea, select');
+            let valid = true; stepEl.classList.remove('was-validated');
+            inputs.forEach(el => { if (!el.checkValidity()) { valid = false; } });
+            if (!valid) { stepEl.classList.add('was-validated'); }
+            return valid;
+        }
 
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+        btnPrev.addEventListener('click', () => setStep(currentStep - 1));
+        btnNext.addEventListener('click', () => { if (validateStep()) setStep(currentStep + 1); });
 
-                if (!form.checkValidity()) {
-                    form.classList.add("was-validated");
-                    return;
-                }
+        function buildReview() {
+            const review = document.getElementById('reviewList');
+            review.innerHTML = '';
+            const kv = [
+                ['Title', document.getElementById('titleInput').value],
+                ['Instruction Text', document.getElementById('descInput').value.substring(0, 240) + (document.getElementById('descInput').value.length > 240 ? '…' : '')],
+                ['Department', document.getElementById('deptInput').selectedOptions[0]?.dataset.label || '—'],
+                ['Assigned Drafter', document.getElementById('drafterInput').selectedOptions[0]?.dataset.label || '—'],
+                ['Status', document.getElementById('statusInput').selectedOptions[0]?.dataset.label || '—'],
+                ['Priority', document.getElementById('priorityInput').selectedOptions[0]?.dataset.label || '—'],
+                ['Received Date', document.getElementById('receivedInput').value || '—']
+            ];
+            kv.forEach(([k, v]) => { const li = document.createElement('li'); li.innerHTML = `<strong>${k}:</strong> ${v}`; review.appendChild(li); });
+            const rf = document.getElementById('reviewFiles'); rf.innerHTML = '';
+            for (let f of fileInput.files) { const s = document.createElement('span'); s.className = 'chip'; s.textContent = f.name; rf.appendChild(s); }
+        }
 
-                // Build FormData matching CreateInstructionDto
-                const formData = new FormData();
-                formData.append("Title", document.getElementById("titleInput").value);
-                formData.append(
-                    "Description",
-                    document.getElementById("descInput").value
-                );
-                formData.append(
-                    "DepartmentID",
-                    document.getElementById("deptInput").value
-                );
-                formData.append(
-                    "AssignedDrafterID",
-                    document.getElementById("drafterInput").value
-                );
-                formData.append("Status", document.getElementById("statusInput").value);
-                formData.append(
-                    "Priority",
-                    document.getElementById("priorityInput").value
-                );
-                formData.append(
-                    "ReceivedDate",
-                    document.getElementById("receivedInput").value
-                );
-
-                const filesInput = document.getElementById("filesInput");
-                for (let i = 0; i < filesInput.files.length; i++) {
-                    formData.append("Files", filesInput.files[i]);
-                }
-
-                try {
-                    const response = await fetch("/api/DraftingInstructions", {
-                        method: "POST",
-                        headers: {
-                            Authorization: "Bearer " + token
-                        },
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        const err = await response.text();
-                        feedbackDiv.innerHTML = `<div class="alert alert-danger">Error: ${err}</div>`;
-                        return;
-                    }
-
-                    const result = await response.json();
-                    feedbackDiv.innerHTML = `<div class="alert alert-success">
-                Instruction submitted (ID: ${result.draftingInstructionID}).<br/>
-                <a href="dashboard.html">Back to Dashboard</a>
-              </div>`;
-                    form.reset();
-                    form.classList.remove("was-validated");
-                } catch (ex) {
-                    feedbackDiv.innerHTML = `<div class="alert alert-danger">
-                Unexpected error. Please try again.
-              </div>`;
-                    console.error(ex);
-                }
-            });
+        // Save Draft button (client-side cache only)
+        document.getElementById('btnSaveDraft').addEventListener('click', () => {
+            const cache = {
+                Title: document.getElementById('titleInput').value,
+                Description: document.getElementById('descInput').value,
+                DepartmentID: document.getElementById('deptInput').value,
+                AssignedDrafterID: document.getElementById('drafterInput').value,
+                StatusID: document.getElementById('statusInput').value,
+                PriorityID: document.getElementById('priorityInput').value,
+                ReceivedDate: document.getElementById('receivedInput').value
+            };
+            localStorage.setItem('opcInstructionDraft', JSON.stringify(cache));
+            const fb = document.getElementById('submitFeedback');
+            fb.innerHTML = '<div class="alert alert-info">Draft saved locally.</div>';
         });
+
+        // Restore cache if present
+        (function restore() {
+            try {
+                const cache = JSON.parse(localStorage.getItem('opcInstructionDraft') || 'null');
+                if (!cache) return;
+                document.getElementById('titleInput').value = cache.Title || '';
+                document.getElementById('descInput').value = cache.Description || '';
+                document.getElementById('deptInput').value = cache.DepartmentID || '';
+                document.getElementById('drafterInput').value = cache.AssignedDrafterID || '';
+                document.getElementById('statusInput').value = cache.StatusID || '';
+                document.getElementById('priorityInput').value = cache.PriorityID || '';
+                document.getElementById('receivedInput').value = cache.ReceivedDate || '';
+            } catch { }
+        })();
+
+        // Form submit
+        const form = document.getElementById('instructionForm');
+        const feedbackDiv = document.getElementById('submitFeedback');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); e.stopPropagation();
+            if (!validateStep()) return; // validate review step too if needed
+
+            const statusSel = document.getElementById('statusInput');
+            const prioritySel = document.getElementById('priorityInput');
+            const statusID = statusSel.value; const statusLabel = statusSel.selectedOptions[0]?.dataset.label || '';
+            const priorityID = prioritySel.value; const priorityLabel = prioritySel.selectedOptions[0]?.dataset.label || '';
+
+            const formData = new FormData();
+            formData.append('Title', document.getElementById('titleInput').value);
+            formData.append('Description', document.getElementById('descInput').value);
+            formData.append('DepartmentID', document.getElementById('deptInput').value); // numeric ID
+            formData.append('AssignedDrafterID', document.getElementById('drafterInput').value); // numeric ID
+            formData.append('Status', statusLabel);
+            formData.append('StatusID', statusID);
+            formData.append('Priority', priorityLabel);
+            formData.append('PriorityID', priorityID);
+            formData.append('ReceivedDate', document.getElementById('receivedInput').value);
+            for (let f of fileInput.files) { formData.append('Files', f); }
+
+            const submitText = document.getElementById('submitText');
+            submitText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting…';
+            document.getElementById('btnSubmit').disabled = true;
+
+            try {
+                const res = await fetch('/api/DraftingInstructions', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: formData });
+                if (!res.ok) { const err = await res.text(); throw new Error(err || 'Request failed'); }
+                const result = await res.json();
+                localStorage.removeItem('opcInstructionDraft');
+                feedbackDiv.innerHTML = `<div class="alert alert-success">Instruction submitted (ID: ${result.draftingInstructionID}). <a href="dashboard.html" class="alert-link">Back to Dashboard</a></div>`;
+                setStep(0); form.reset(); chips.innerHTML = '';
+            } catch (ex) {
+                feedbackDiv.innerHTML = `<div class="alert alert-danger">Error: ${ex.message || 'Unexpected error'}</div>`;
+            } finally {
+                submitText.textContent = 'Submit Instruction';
+                document.getElementById('btnSubmit').disabled = false;
+            }
+        });
+
+        // Heartbeat (lock)
+        const instructionId = 1; // replace dynamically when available
+        const heartbeatInterval = 5 * 60 * 1000; // 5 minutes
+        let intervalId = setInterval(sendHeartbeat, heartbeatInterval);
+        async function sendHeartbeat() {
+            try {
+                const response = await fetch(`/api/draftlock/heartbeat/${instructionId}`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+                if (!response.ok) { showLockToast(); clearInterval(intervalId); autoSaveDraft(); }
+            } catch { showLockToast(); clearInterval(intervalId); autoSaveDraft(); }
+        }
+        function showLockToast() { document.getElementById('lock-toast').style.display = 'block'; }
+        function autoSaveDraft() {
+            const content = document.getElementById('descInput').value; // generic fallback
+            fetch(`/api/drafts/autosave/${instructionId}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ content }) }).catch(() => { });
+        }
+
+        // Init first step
+        setStep(0);
     </script>
 </body>
 </html>

@@ -29,6 +29,9 @@ namespace OPC.EFiling.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
+            if (string.IsNullOrEmpty(model.Password))
+                return BadRequest("Password cannot be null or empty."); // Ensure password is not null or empty
+
             var user = new User
             {
                 UserName = model.Email,
@@ -59,7 +62,13 @@ namespace OPC.EFiling.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (string.IsNullOrEmpty(model.Email))
+                return BadRequest("Email cannot be null or empty.");
+
+            if (string.IsNullOrEmpty(model.Password))
+                return BadRequest("Password cannot be null or empty."); // Added null check for Password
+
+            var user = await _userManager.FindByEmailAsync(model.Email ?? string.Empty); // Fix for CS8604
             if (user == null)
                 return Unauthorized();
 
@@ -74,14 +83,19 @@ namespace OPC.EFiling.API.Controllers
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+            var keyString = jwtSettings["Key"];
+
+            if (string.IsNullOrEmpty(keyString))
+                throw new InvalidOperationException("JWT key is not configured properly.");
+
+            var key = Encoding.UTF8.GetBytes(keyString);
 
             var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-        new Claim(JwtRegisteredClaimNames.Email, user.Email),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty), // Fix for CS8604
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             // Add roles to claims
             var userRoles = _userManager.GetRolesAsync(user).Result;
@@ -105,6 +119,9 @@ namespace OPC.EFiling.API.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
         {
+            if (string.IsNullOrEmpty(model.Email)) // Ensure Email is not null or empty
+                return BadRequest("Email cannot be null or empty.");
+
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
                 return Ok("If the email exists, an OTP has been sent."); // Avoid leaking info
@@ -125,6 +142,15 @@ namespace OPC.EFiling.API.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordWithOtpModel model)
         {
+            if (string.IsNullOrEmpty(model.Email))
+                return BadRequest("Email cannot be null or empty.");
+
+            if (string.IsNullOrEmpty(model.Otp))
+                return BadRequest("OTP cannot be null or empty.");
+
+            if (string.IsNullOrEmpty(model.NewPassword))
+                return BadRequest("New password cannot be null or empty."); // Ensure NewPassword is not null or empty
+
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
                 return BadRequest("Invalid request.");

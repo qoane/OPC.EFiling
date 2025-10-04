@@ -21,8 +21,4 @@
     <ProjectReference Include="..\OPC.EFiling.Infrastructure\OPC.EFiling.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\New folder\" />
-  </ItemGroup>
-
 </Project>

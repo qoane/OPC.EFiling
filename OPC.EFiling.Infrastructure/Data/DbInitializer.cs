@@ -7,7 +7,7 @@ namespace OPC.EFiling.Infrastructure.Data
     {
         public static async Task SeedRolesAsync(RoleManager<Role> roleManager)
         {
-            var roles = new List<string> { "Admin", "Drafter", "RegistryOfficer" };
+            var roles = new List<string> { "Admin", "Drafter", "RegistryOfficer", "PC" };
 
             foreach (var roleName in roles)
             {

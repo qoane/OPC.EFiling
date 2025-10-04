@@ -25,6 +25,9 @@ namespace OPC.EFiling.Infrastructure.Data
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 
+        public DbSet<InstructionLock> InstructionLocks { get; set; }
+        public DbSet<DraftVersion> DraftVersions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -41,6 +44,18 @@ namespace OPC.EFiling.Infrastructure.Data
                 .HasOne(d => d.DraftingInstruction)
                 .WithMany(i => i.Drafts)
                 .HasForeignKey(d => d.DraftingInstructionID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DraftVersion>()
+                .HasOne<DraftingInstruction>()
+                .WithMany()
+                .HasForeignKey(dv => dv.DraftingInstructionID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<InstructionLock>()
+                .HasOne<DraftingInstruction>()
+                .WithMany()
+                .HasForeignKey(l => l.DraftingInstructionID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // If you have any existing relationships to configure (e.g. for Documents or UploadedFile),
