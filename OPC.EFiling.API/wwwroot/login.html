@@ -2,229 +2,391 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>OPC E-Filing — Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OPC E‑Filing — Login</title>
 
-    <!-- 1) BOOTSTRAP 5 CSS (via CDN) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
-          rel="stylesheet" />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- 2) FONT AWESOME (for icons) -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          integrity="sha512-pM2eEdx..."
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer" />
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!-- 3) OUR REUSABLE STYLESHEET -->
-    <link rel="stylesheet" href="/css/style.css" />
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
     <style>
-        /* Page-specific: full‐page gradient + card positioning */
+        :root {
+            /* Nude / muted neutrals */
+            --nude-10: #fdfcfb;
+            --nude-25: #fbf8f5;
+            --nude-50: #f7f3ef;
+            --nude-100: #efe9e3;
+            --nude-200: #e4dbd3;
+            --nude-300: #d7ccc5;
+            /* Lesotho flag accents */
+            --les-blue: #0c4ad4; /* rich blue */
+            --les-green: #1f8a43; /* deep green */
+            --ink-900: #0b1020;
+            --ink-700: #1f2a44;
+            --ink-500: #4b587a;
+            --ink-300: #8a95ad;
+            --glass-bg: 24,36,66;
+            --glass-alpha: .6;
+            --radius-2xl: 22px;
+            --shadow-md: 0 10px 30px rgba(11,16,32,.15);
+        }
+
+        html, body {
+            height: 100%
+        }
+
         body {
-            background: linear-gradient(135deg, #004080 0%, #001f3f 100%);
-            /* Add a little top padding so the card isn't hidden under the navbar */
-            padding-top: 70px; /* ≈ the height of your navbar (60px) + small buffer */
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--ink-700);
+            background: radial-gradient(1200px 800px at 10% -10%, var(--nude-10), var(--nude-25)), radial-gradient(1000px 700px at 110% 10%, var(--nude-50), var(--nude-10));
+            overflow-x: hidden;
+            padding-top: 72px; /* navbar height buffer */
+        }
+
+        /* Flag accent bar */
+        .flag-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1040;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06)
+        }
+
+            .flag-bar .bar {
+                height: 6px
+            }
+
+        .flag-blue {
+            background: var(--les-blue)
+        }
+
+        .flag-white {
+            background: #fff
+        }
+
+        .flag-green {
+            background: var(--les-green)
+        }
+
+        /* Orbs */
+        .orb {
+            position: absolute;
+            filter: blur(40px);
+            opacity: .28;
+            z-index: 0
+        }
+
+            .orb.blue {
+                background: radial-gradient( circle at 40% 40%, #2e6cff, rgba(46,108,255,0) 60% );
+            }
+
+            .orb.green {
+                background: radial-gradient( circle at 60% 60%, #3ecf6d, rgba(62,207,109,0) 60% );
+            }
+
+            .orb.nude {
+                background: radial-gradient( circle at 50% 50%, #ffe8d8, rgba(255,232,216,0) 60% );
+            }
+
+            .orb.size-lg {
+                width: 520px;
+                height: 520px;
+                border-radius: 50%
+            }
+
+            .orb.size-md {
+                width: 360px;
+                height: 360px;
+                border-radius: 50%
+            }
+
+            .orb.size-sm {
+                width: 220px;
+                height: 220px;
+                border-radius: 50%
+            }
+
+        @keyframes floaty {
+            0% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-18px)
+            }
+
+            100% {
+                transform: translateY(0)
+            }
+        }
+
+        .animate-float {
+            animation: floaty 10s ease-in-out infinite
+        }
+
+        /* Glass */
+        .glass {
+            background: rgba(var(--glass-bg),var(--glass-alpha));
+            backdrop-filter: blur(14px) saturate(130%);
+            -webkit-backdrop-filter: blur(14px) saturate(130%);
+            border: 1px solid rgba(255,255,255,.25);
+            box-shadow: var(--shadow-md);
+            border-radius: var(--radius-2xl)
+        }
+
+        /* Navbar */
+        .navbar.glassy {
+            background: rgba(255,255,255,.65) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,.06)
+        }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-weight: 800;
+            color: var(--ink-900)
+        }
+
+            .brand-mark img {
+                width: 32px;
+                height: 32px
+            }
+
+        /* Login wrap */
+        .login-wrap {
+            position: relative;
+            min-height: calc(100vh - 140px);
+            display: grid;
+            place-items: center
         }
 
         .login-card {
-            max-width: 400px;
-            margin: auto;
-            margin-top: 3rem;
-            margin-bottom: 3rem;
-            background-color: var(--color-card-bg);
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            animation: slideInLeft var(--anim-medium) ease;
+            max-width: 440px;
+            width: 100%
         }
 
-        .login-header {
-            background: var(--color-primary);
-            color: var(--color-text-light);
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-            .login-header h2 {
-                margin: 0;
-                font-size: 1.75rem;
-                letter-spacing: 0.05rem;
+            .login-card .header {
+                display: flex;
+                align-items: center;
+                gap: .75rem;
+                padding: 1.1rem 1.25rem;
+                border-bottom: 1px solid rgba(255,255,255,.25)
             }
 
-        .login-body {
-            padding: 2rem;
-        }
-
-            .login-body .form-group {
-                margin-bottom: 1.25rem;
-            }
-
-            .login-body label {
-                font-weight: 500;
-                margin-bottom: 0.5rem;
-                display: block;
-                color: var(--color-text);
-            }
-
-        .login-footer {
-            text-align: center;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-        }
-
-            .login-footer a {
-                color: var(--color-secondary);
-                font-size: 0.9rem;
-            }
-
-                .login-footer a:hover {
-                    color: var(--color-accent);
+                .login-card .header .badge {
+                    background: #fff;
+                    color: var(--ink-900)
                 }
+
+            .login-card .body {
+                padding: 1.25rem
+            }
+
+        .form-control {
+            border-radius: 12px
+        }
+
+        .input-group-text {
+            border-radius: 12px
+        }
+
+        .btn-flag {
+            background: linear-gradient(90deg, var(--les-blue), #1a66ff 48%, #fff 49%, #fff 51%, var(--les-green) 52%, #31a95a 100%);
+            color: #0b1020;
+            border: none
+        }
+
+        .btn-ghost {
+            background: #fff;
+            border: 1px solid rgba(11,16,32,.12)
+        }
+
+        .help-links a {
+            color: var(--ink-500);
+            text-decoration: none
+        }
+
+            .help-links a:hover {
+                color: var(--ink-900)
+            }
+
+        footer {
+            background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.9))
+        }
+
+        @media (max-width: 991px) {
+            body {
+                padding-top: 68px
+            }
+        }
     </style>
 </head>
+<body>
+    <!-- Flag accent bar -->
+    <div class="flag-bar">
+        <div class="bar flag-blue"></div>
+        <div class="bar flag-white"></div>
+        <div class="bar flag-green"></div>
+    </div>
 
-<body class="d-flex flex-column min-vh-100">
-    <!-- ─── NAVBAR (swapped to match index.html) ──────────────────────────────────────────── -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <!-- Orbs -->
+    <div class="orb blue size-lg animate-float" style="top:-120px; left:-120px"></div>
+    <div class="orb green size-md animate-float" style="bottom:10%; right:-80px; animation-delay:.6s"></div>
+    <div class="orb nude size-sm animate-float" style="top:40%; left:10%"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg glassy fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="index.html">
-                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png"
-                     alt="Lesotho Coat of Arms"
-                     width="32"
-                     height="32"
-                     class="me-2" />
-                <span class="fw-bold">OPC E-Filing</span>
+            <a class="navbar-brand brand-mark" href="index.html">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" alt="Lesotho Coat of Arms">
+                <span>OPC <span class="text-primary">E‑Filing</span></span>
             </a>
-            <button class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNavLogin"
-                    aria-controls="navbarNavLogin"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNavLogin">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="login.html">Login</a>
-                    </li>
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="index.html#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#process">Process</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#integrations">Integrations</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="login.html">Login</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    <!-- ────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── LOGIN CARD ──────────────────────────────────────────────────────────────────── -->
-    <div class="login-card rounded shadow-lg">
-        <div class="login-header">
-            <h2>Login to Your Account</h2>
-        </div>
-        <div class="login-body">
-            <form id="loginForm" novalidate>
-                <!-- Email -->
-                <div class="form-group">
-                    <label for="inputEmail">Email Address</label>
-                    <input type="email"
-                           class="form-control"
-                           id="inputEmail"
-                           placeholder="name@example.com"
-                           required />
-                    <div class="invalid-feedback">
-                        Please enter a valid email address.
+
+    <!-- LOGIN -->
+    <main class="login-wrap container position-relative" data-aos="zoom-in">
+        <div class="glass login-card">
+            <div class="header">
+                <span class="feature-icon" style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;font-weight:700;background:linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,.05)); border:1px solid rgba(255,255,255,.4);"><i class="bi bi-box-arrow-in-right"></i></span>
+                <div>
+                    <div class="fw-bold">Login to Your Account</div>
+                    <small class="text-muted">Secure access for authorised users</small>
+                </div>
+                <span class="badge ms-auto">v1</span>
+            </div>
+            <div class="body">
+                <form id="loginForm" novalidate>
+                    <div class="mb-3">
+                        <label for="inputEmail" class="form-label">Email address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" id="inputEmail" placeholder="name@example.com" required />
+                            <div class="invalid-feedback">Please enter a valid email.</div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Password -->
-                <div class="form-group">
-                    <label for="inputPassword">Password</label>
-                    <input type="password"
-                           class="form-control"
-                           id="inputPassword"
-                           placeholder="Enter your password"
-                           required />
-                    <div class="invalid-feedback">
-                        Please enter your password.
+                    <div class="mb-3">
+                        <label for="inputPassword" class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                            <input type="password" class="form-control" id="inputPassword" placeholder="••••••••" required />
+                            <button class="btn btn-light" type="button" id="togglePass" aria-label="Show password"><i class="bi bi-eye"></i></button>
+                            <div class="invalid-feedback">Please enter your password.</div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Submit Button -->
-                <div class="d-grid mt-4">
-                    <button id="btnLogin" class="btn btn-secondary btn-block" type="submit">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </button>
-                </div>
-            </form>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <a class="small" href="#">Forgot password?</a>
+                    </div>
 
-            <div class="login-footer">
-                <a href="#">Forgot password?</a>
+                    <div class="d-grid gap-2">
+                        <button id="btnLogin" class="btn btn-flag" type="submit"><i class="bi bi-box-arrow-in-right me-1"></i>Login</button>
+                        <button class="btn btn-ghost" type="button" onclick="window.location.href='index.html'"><i class="bi bi-house-door me-1"></i>Back to homepage</button>
+                    </div>
+
+                    <div class="help-links text-center mt-3 small">
+                        <span class="me-2"><i class="bi bi-shield-check"></i> TLS secured</span>
+                        <span class="me-2"><i class="bi bi-fingerprint"></i> Audit trails</span>
+                        <span><i class="bi bi-hdd-network"></i> SSO ready</span>
+                    </div>
+                </form>
             </div>
         </div>
-    </div>
-    <!-- ────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── FOOTER (identical to index footer) ──────────────────────────────────────────── -->
-    <footer class="bg-light text-center py-4 mt-auto">
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-4 mt-5">
         <div class="container">
-            <p class="mb-1">© 2025 Office of Parliamentary Counsel, Lesotho</p>
-            <small>All rights reserved.</small>
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" width="24" height="24" alt="Lesotho Coat of Arms">
+                    <span class="fw-bold">Office of Parliamentary Counsel</span>
+                </div>
+                <div class="small text-muted">© 2025 Government of Lesotho · All rights reserved</div>
+            </div>
         </div>
     </footer>
-    <!-- ────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── BOOTSTRAP 5 JS (via CDN) ──────────────────────────────────────────────────────── -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- ─── LOGIN SCRIPT (unchanged) ──────────────────────────────────────────────────────── -->
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('loginForm');
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    form.classList.add('was-validated');
+        AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 80 });
+
+        // Toggle password visibility
+        const toggleBtn = document.getElementById('togglePass');
+        const passInput = document.getElementById('inputPassword');
+        toggleBtn?.addEventListener('click', () => {
+            const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passInput.setAttribute('type', type);
+            toggleBtn.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+        });
+
+        // Login logic
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            const form = event.currentTarget;
+            if (!form.checkValidity()) {
+                event.preventDefault(); event.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+            event.preventDefault();
+
+            const email = document.getElementById('inputEmail').value.trim();
+            const password = document.getElementById('inputPassword').value.trim();
+
+            try {
+                const btn = document.getElementById('btnLogin');
+                btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
+                const res = await fetch('/api/Auth/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                if (!res.ok) {
+                    const text = await res.text();
+                    alert('Login failed: ' + text);
+                    btn.disabled = false; btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i>Login';
                     return;
                 }
-                event.preventDefault();
-                sendLoginRequest();
-            });
-
-            async function sendLoginRequest() {
-                const email = document.getElementById('inputEmail').value.trim();
-                const password = document.getElementById('inputPassword').value.trim();
-                if (!email || !password) {
-                    alert('Both email and password are required.');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/api/Auth/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email: email, password: password })
-                    });
-
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        alert('Login failed: ' + errorText);
-                        return;
-                    }
-
-                    const data = await response.json();
-                    localStorage.setItem('jwtToken', data.token);
-                    window.location.href = 'dashboard.html';
-                } catch (err) {
-                    console.error(err);
-                    alert('An unexpected error occurred during login.');
-                }
+                const data = await res.json();
+                localStorage.setItem('jwtToken', data.token);
+                window.location.href = 'dashboard.html';
+            } catch (err) {
+                console.error(err);
+                alert('An unexpected error occurred during login.');
+                document.getElementById('btnLogin').disabled = false;
+                document.getElementById('btnLogin').innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i>Login';
             }
         });
     </script>
-    <!-- ────────────────────────────────────────────────────────────────────────────────── -->
 </body>
 </html>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using OPC.EFiling.Domain.Entities;
 
 // NOTE: This controller adds the ability for an existing admin to create
 // additional admin accounts.  Only users with the "Admin" role may access
@@ -16,11 +17,13 @@ namespace OPC.EFiling.API.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        // Use the application's custom user and role types (IdentityUser<int> and IdentityRole<int>)
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
 
-        public AdminController(UserManager<IdentityUser> userManager,
-                               RoleManager<IdentityRole> roleManager)
+        public AdminController(
+            UserManager<User> userManager,
+            RoleManager<Role> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -43,10 +46,15 @@ namespace OPC.EFiling.API.Controllers
             // Ensure the Admin role exists
             if (!await _roleManager.RoleExistsAsync("Admin"))
             {
-                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _roleManager.CreateAsync(new Role { Name = "Admin" });
             }
 
-            var user = new IdentityUser { UserName = input.Email, Email = input.Email, EmailConfirmed = true };
+            var user = new User
+            {
+                UserName = input.Email,
+                Email = input.Email,
+                EmailConfirmed = true
+            };
             var result = await _userManager.CreateAsync(user, input.Password);
             if (!result.Succeeded)
             {

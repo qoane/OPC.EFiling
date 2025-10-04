@@ -2,281 +2,626 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>OPC E-Filing — All Instructions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OPC E‑Filing — All Instructions</title>
 
-    <!-- 1) BOOTSTRAP 5 CSS (via CDN) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
-          rel="stylesheet" />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- 2) FONT AWESOME (for icons) -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          integrity="sha512-pM2eEdx..."
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer" />
-
-    <!-- 3) OUR REUSABLE STYLESHEET -->
-    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap 5 + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 
     <style>
+        :root {
+            --les-blue: #0c4ad4;
+            --les-green: #1f8a43;
+            --ink-900: #0b1020;
+            --ink-700: #1f2a44;
+            --ink-500: #4b587a;
+            --nude-10: #fdfcfb;
+            --nude-25: #fbf8f5;
+            --nude-50: #f7f3ef;
+            --glass-bg: 24,36,66;
+            --glass-alpha: .6;
+            --radius-2xl: 22px;
+            --shadow-md: 0 10px 30px rgba(11,16,32,.15);
+            --chip-bg: #fff;
+            --chip-br: rgba(0,0,0,.08);
+        }
+
+        html, body {
+            height: 100%
+        }
+
         body {
-            background: var(--color-bg-light);
-            padding-top: calc(var(--header-height) + 10px);
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--ink-700);
+            background: radial-gradient(1200px 800px at 10% -10%, var(--nude-10), var(--nude-25)), radial-gradient(1000px 700px at 110% 10%, var(--nude-50), var(--nude-10));
+            overflow-x: hidden;
+            padding-top: 72px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .table-container {
-            max-width: 95%;
-            margin: 2rem auto;
-            overflow-x: auto;
+        /* Flag bar */
+        .flag-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1040;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06)
         }
 
-        table {
-            min-width: 800px;
+            .flag-bar .bar {
+                height: 6px
+            }
+
+        .flag-blue {
+            background: var(--les-blue)
         }
 
-        .no-data {
-            text-align: center;
-            padding: 2rem;
-            color: var(--color-text);
+        .flag-white {
+            background: #fff
+        }
+
+        .flag-green {
+            background: var(--les-green)
+        }
+
+        /* Orbs */
+        .orb {
+            position: absolute;
+            filter: blur(40px);
+            opacity: .28;
+            z-index: 0
+        }
+
+            .orb.blue {
+                background: radial-gradient( circle at 40% 40%, #2e6cff, rgba(46,108,255,0) 60% );
+            }
+
+            .orb.green {
+                background: radial-gradient( circle at 60% 60%, #3ecf6d, rgba(62,207,109,0) 60% );
+            }
+
+            .orb.nude {
+                background: radial-gradient( circle at 50% 50%, #ffe8d8, rgba(255,232,216,0) 60% );
+            }
+
+            .orb.size-lg {
+                width: 520px;
+                height: 520px;
+                border-radius: 50%
+            }
+
+            .orb.size-md {
+                width: 360px;
+                height: 360px;
+                border-radius: 50%
+            }
+
+            .orb.size-sm {
+                width: 220px;
+                height: 220px;
+                border-radius: 50%
+            }
+
+        @keyframes floaty {
+            0% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-18px)
+            }
+
+            100% {
+                transform: translateY(0)
+            }
+        }
+
+        .animate-float {
+            animation: floaty 10s ease-in-out infinite
+        }
+
+        /* Glass */
+        .glass {
+            background: rgba(var(--glass-bg),var(--glass-alpha));
+            backdrop-filter: blur(14px) saturate(130%);
+            -webkit-backdrop-filter: blur(14px) saturate(130%);
+            border: 1px solid rgba(255,255,255,.25);
+            box-shadow: var(--shadow-md);
+            border-radius: var(--radius-2xl)
+        }
+
+        /* Navbar */
+        .navbar.glassy {
+            background: rgba(255,255,255,.65) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,.06)
+        }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-weight: 800;
+            color: var(--ink-900)
+        }
+
+            .brand-mark img {
+                width: 32px;
+                height: 32px
+            }
+
+        /* Header */
+        .page-header {
+            position: relative;
+            padding: 36px 0 16px
+        }
+
+            .page-header .halo {
+                position: absolute;
+                inset: -40px -40px -20px -40px;
+                pointer-events: none;
+                z-index: 0;
+                background: radial-gradient(900px 500px at 45% -10%, rgba(12,74,212,.18), rgba(12,74,212,0) 60%), radial-gradient(800px 480px at 80% 10%, rgba(31,138,67,.16), rgba(31,138,67,0) 60%);
+            }
+
+            .page-header .inner {
+                position: relative;
+                z-index: 1
+            }
+
+        /* Filters bar */
+        .filters.glass {
+            padding: 14px
+        }
+
+        .chip {
+            padding: .35rem .6rem;
+            border-radius: 999px;
+            font-size: .85rem;
+            background: var(--chip-bg);
+            border: 1px solid var(--chip-br)
+        }
+
+        /* Table */
+        .table-wrap.glass {
+            padding: 0;
+            overflow: hidden
+        }
+
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 1
+        }
+
+        .status-badge {
+            padding: .25rem .5rem;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 600;
+            border: 1px solid rgba(0,0,0,.06);
+            background: #fff
+        }
+
+        .status-Submitted {
+            border-color: #cbd5e1
+        }
+
+        .status-Logged {
+            border-color: #a8c5ff
+        }
+
+        .status-Assigned {
+            border-color: #9ec5fe
+        }
+
+        .status-In\ Drafting {
+            border-color: #ffe08a
+        }
+
+        .status-Under\ Review {
+            border-color: #f3bda1
+        }
+
+        .status-Returned {
+            border-color: #f5a3a3
+        }
+
+        .status-Finalized {
+            border-color: #a8e6a1
+        }
+
+        .status-Archived {
+            border-color: #d3d3d3
+        }
+
+        .prio {
+            padding: .25rem .5rem;
+            border-radius: 6px;
+            font-size: .75rem;
+            font-weight: 700
+        }
+
+        .prio-Urgent {
+            background: #ffe1e1
+        }
+
+        .prio-High {
+            background: #ffecc7
+        }
+
+        .prio-Medium {
+            background: #e7f0ff
+        }
+
+        .prio-Low {
+            background: #e9f7ee
+        }
+
+        .prio-Deferred {
+            background: #efefef
+        }
+
+        .action-col {
+            white-space: nowrap
+        }
+
+        footer {
+            background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.9))
         }
     </style>
 </head>
+<body>
+    <!-- Flag bar -->
+    <div class="flag-bar">
+        <div class="bar flag-blue"></div>
+        <div class="bar flag-white"></div>
+        <div class="bar flag-green"></div>
+    </div>
 
-<body class="d-flex flex-column min-vh-100">
-    <!-- ─── NAVBAR (same as other pages) ─────────────────────────────────────────────────────────── -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <!-- Orbs -->
+    <div class="orb blue size-lg animate-float" style="top:-120px; left:-120px"></div>
+    <div class="orb green size-md animate-float" style="bottom:10%; right:-80px; animation-delay:.6s"></div>
+    <div class="orb nude size-sm animate-float" style="top:40%; left:10%"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg glassy fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="index.html">
-                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png"
-                     alt="Lesotho Coat of Arms"
-                     width="32"
-                     height="32"
-                     class="me-2" />
-                <span class="fw-bold">OPC E-Filing</span>
+            <a class="navbar-brand brand-mark" href="index.html">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" alt="Lesotho Coat of Arms">
+                <span>OPC <span class="text-primary">E‑Filing</span></span>
             </a>
-            <button class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNavInst"
-                    aria-controls="navbarNavInst"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavInst">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="instructions.html">
-                            <i class="fas fa-list"></i> All Instructions
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="logoutLinkInst">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
-                    </li>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="instructions.html"><i class="bi bi-list-check me-1"></i>All Instructions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── MAIN CONTENT: Table of Instructions ─────────────────────────────────────────────────── -->
-    <div class="table-container">
-        <h2 class="mt-4 mb-3">All Drafting Instructions</h2>
-        <div id="feedback" class="mb-3"></div>
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Department ID</th>
-                    <th scope="col">Assigned Drafter ID</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Priority</th>
-                    <th scope="col">Received Date</th>
-                    <th scope="col">Attachments</th>
-                </tr>
-            </thead>
-            <tbody id="instructionsBody">
-                <!-- Rows will be injected here via JavaScript -->
-            </tbody>
-        </table>
-        <div id="noData" class="no-data d-none">
-            No instructions found.
+
+    <!-- HEADER -->
+    <header class="page-header">
+        <div class="halo"></div>
+        <div class="inner container" data-aos="fade-up">
+            <h1 class="fw-bolder mb-2">All Drafting Instructions</h1>
+            <p class="text-muted mb-0">Search, filter, preview, and export the full register.</p>
+        </div>
+    </header>
+
+    <!-- FILTERS -->
+    <section class="container mb-3">
+        <div class="filters glass" data-aos="zoom-in">
+            <div class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label small">Search</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="q" class="form-control" placeholder="Title, description, ID…" />
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">Status</label>
+                    <select id="fStatus" class="form-select">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">Priority</label>
+                    <select id="fPriority" class="form-select">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label small">Department</label>
+                    <select id="fDept" class="form-select">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-1 d-grid">
+                    <button id="btnClear" class="btn btn-ghost">Clear</button>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-2 small">
+                <span id="countChip" class="chip">0 records</span>
+                <button id="btnExport" class="btn btn-sm btn-ghost"><i class="bi bi-download me-1"></i>Export CSV</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- TABLE -->
+    <section class="container">
+        <div class="table-wrap glass" data-aos="fade-up">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th style="min-width:220px">Title</th>
+                            <th style="min-width:300px">Description</th>
+                            <th>Department</th>
+                            <th>Drafter</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Received</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+            <div id="noData" class="p-4 text-center text-muted d-none">No instructions found.</div>
+
+            <!-- Pagination -->
+            <div class="d-flex align-items-center justify-content-between p-3 border-top">
+                <div class="small text-muted">Page <span id="pageNum">1</span> of <span id="pageTotal">1</span></div>
+                <div class="btn-group">
+                    <button class="btn btn-ghost" id="prevPage"><i class="bi bi-chevron-left"></i></button>
+                    <button class="btn btn-ghost" id="nextPage"><i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREVIEW OFFCANVAS -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="preview" aria-labelledby="previewLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="previewLabel">Instruction</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mb-2"><span class="chip" id="pvDept">—</span> <span class="chip" id="pvStatus">—</span> <span class="chip" id="pvPriority">—</span></div>
+            <h4 id="pvTitle" class="mb-2">—</h4>
+            <div class="small text-muted mb-2" id="pvMeta">—</div>
+            <p id="pvDesc" class="mb-3">—</p>
+            <div>
+                <h6>Attachments</h6>
+                <div id="pvFiles" class="d-flex flex-column gap-1 small"></div>
+            </div>
+            <div class="mt-3">
+                <a id="pvOpenDraft" class="btn btn-flag" href="drafter-dashboard.html"><i class="bi bi-pencil-square me-1"></i>Open in editor</a>
+            </div>
         </div>
     </div>
-    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── LOGOUT CONFIRMATION MODAL ───────────────────────────────────────────────────────────── -->
-    <div class="modal fade"
-         id="logoutModalInst"
-         tabindex="-1"
-         aria-labelledby="logoutModalLabelInst"
-         aria-hidden="true">
+
+    <!-- LOGOUT MODAL -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content glass">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabelInst">Confirm Logout</h5>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">Are you sure you want to log out?</div>
                 <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-                    <button type="button"
-                            class="btn btn-danger"
-                            id="confirmLogoutInst">
-                        Logout
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmLogout">Logout</button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── FOOTER ──────────────────────────────────────────────────────────────────────────────── -->
-    <footer class="bg-light text-center py-4 mt-auto">
+
+    <!-- FOOTER -->
+    <footer class="py-4 mt-auto">
         <div class="container">
-            <p class="mb-1">© 2025 Office of Parliamentary Counsel, Lesotho</p>
-            <small>All rights reserved.</small>
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" width="24" height="24" alt="Lesotho Coat of Arms">
+                    <span class="fw-bold">Office of Parliamentary Counsel</span>
+                </div>
+                <div class="small text-muted">© 2025 Government of Lesotho · All rights reserved</div>
+            </div>
         </div>
     </footer>
-    <!-- ──────────────────────────────────────────────────────────────────────────────────────── -->
-    <!-- ─── BOOTSTRAP 5 JS (via CDN) ────────────────────────────────────────────────────────────── -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      // 1) Security check: redirect to login if no JWT found
-      const token = localStorage.getItem("jwtToken");
-      if (!token) {
-        window.location.href = "login.html";
-        return;
-      }
+        AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 80 });
 
-      // 2) Logout logic (modal)
-      const logoutLink = document.getElementById("logoutLinkInst");
-      const logoutModal = new bootstrap.Modal(
-        document.getElementById("logoutModalInst")
-      );
-      logoutLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        logoutModal.show();
-      });
-      document
-        .getElementById("confirmLogoutInst")
-        .addEventListener("click", () => {
-          localStorage.removeItem("jwtToken");
-          window.location.href = "login.html";
+        // JWT guard
+        const token = localStorage.getItem('jwtToken');
+        if (!token) { window.location.href = 'login.html'; }
+
+        // Lookups (keep in sync with other pages)
+        const DEPARTMENTS = [
+            { id: 201, name: "Prime Minister's Office" },
+            { id: 202, name: "Ministry of Law and Justice" },
+            { id: 203, name: "Ministry of Finance and Development Planning" },
+            { id: 204, name: "Ministry of Foreign Affairs and International Relations" },
+            { id: 205, name: "Ministry of Education and Training" },
+            { id: 206, name: "Ministry of Health" },
+            { id: 207, name: "Ministry of Agriculture, Food Security and Nutrition" },
+            { id: 208, name: "Ministry of Natural Resources" },
+            { id: 209, name: "Ministry of Public Works and Transport" },
+            { id: 210, name: "Ministry of Local Government, Chieftainship, Home Affairs and Police" },
+            { id: 211, name: "Ministry of Information, Communications, Science, Technology and Innovation" },
+            { id: 212, name: "Ministry of Trade, Industry and Small Business" },
+            { id: 213, name: "Ministry of Gender, Youth and Social Development" },
+            { id: 214, name: "Ministry of Public Service" },
+            { id: 215, name: "Ministry of Energy" },
+            { id: 216, name: "Ministry of Tourism, Sports, Arts and Culture" },
+            { id: 217, name: "Ministry of Labour and Employment" },
+            { id: 218, name: "Ministry of Environment and Forestry" }
+        ];
+        const DRAFTERS = [{ id: 801, name: 'Qoane Seitlheko' }, { id: 802, name: 'TSepo Kaibe' }];
+
+        const STATUSES = ['Submitted', 'Logged', 'Assigned', 'In Drafting', 'Under Review', 'Returned', 'Finalized', 'Archived'];
+        const PRIORITIES = ['Urgent', 'High', 'Medium', 'Low', 'Deferred'];
+
+        // Elements
+        const q = document.getElementById('q');
+        const fStatus = document.getElementById('fStatus');
+        const fPriority = document.getElementById('fPriority');
+        const fDept = document.getElementById('fDept');
+        const btnClear = document.getElementById('btnClear');
+        const btnExport = document.getElementById('btnExport');
+        const tbody = document.getElementById('tbody');
+        const noData = document.getElementById('noData');
+        const countChip = document.getElementById('countChip');
+
+        // Pagination
+        let page = 1; const pageSize = 10; let filtered = []; let all = [];
+        const pageNum = document.getElementById('pageNum');
+        const pageTotal = document.getElementById('pageTotal');
+        document.getElementById('prevPage').onclick = () => { if (page > 1) { page--; render(); } };
+        document.getElementById('nextPage').onclick = () => { if (page < Math.max(1, Math.ceil(filtered.length / pageSize))) { page++; render(); } };
+
+        // Fill filter selects
+        function fillSelect(select, items) { items.forEach(x => { const o = document.createElement('option'); o.value = x.id || x; o.textContent = x.name || x; select.appendChild(o); }); }
+        fillSelect(fStatus, STATUSES);
+        fillSelect(fPriority, PRIORITIES);
+        fillSelect(fDept, DEPARTMENTS);
+
+        // Logout modal
+        const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+        document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); logoutModal.show(); });
+        document.getElementById('confirmLogout').addEventListener('click', () => { localStorage.removeItem('jwtToken'); window.location.href = 'login.html'; });
+
+        // Fetch data
+        (async function load() {
+            try {
+                const res = await fetch('/api/DraftingInstructions', { headers: { Authorization: 'Bearer ' + token } });
+                if (!res.ok) { tbody.innerHTML = ''; noData.classList.remove('d-none'); return; }
+                all = await res.json();
+                applyFilters();
+            } catch (e) { tbody.innerHTML = ''; noData.classList.remove('d-none'); }
+        })();
+
+        // Filtering
+        [q, fStatus, fPriority, fDept].forEach(el => el.addEventListener('input', applyFilters));
+        btnClear.addEventListener('click', () => { q.value = ''; fStatus.value = ''; fPriority.value = ''; fDept.value = ''; applyFilters(); });
+
+        function applyFilters() {
+            const query = q.value.toLowerCase();
+            filtered = (all || []).filter(r => {
+                const okQ = !query || (r.title || '').toLowerCase().includes(query) || (r.description || '').toLowerCase().includes(query) || String(r.draftingInstructionID).includes(query);
+                const okS = !fStatus.value || (r.status || '') === fStatus.value;
+                const okP = !fPriority.value || (r.priority || '') === fPriority.value;
+                const okD = !fDept.value || String(r.departmentID) === String(fDept.value);
+                return okQ && okS && okP && okD;
+            });
+            page = 1; render();
+        }
+
+        // Render table
+        function render() {
+            const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+            pageNum.textContent = page; pageTotal.textContent = totalPages;
+            countChip.textContent = `${filtered.length} record${filtered.length === 1 ? '' : 's'}`;
+
+            tbody.innerHTML = '';
+            if (!filtered.length) { noData.classList.remove('d-none'); return; } else { noData.classList.add('d-none'); }
+
+            const start = (page - 1) * pageSize; const slice = filtered.slice(start, start + pageSize);
+            slice.forEach(r => tbody.appendChild(rowTpl(r)));
+        }
+
+        function rowTpl(r) {
+            const tr = document.createElement('tr');
+            const dept = DEPARTMENTS.find(d => d.id === r.departmentID)?.name || `Dept #${r.departmentID}`;
+            const drafter = ({ 801: 'Qoane Seitlheko', 802: 'TSepo Kaibe' })[r.assignedDrafterID] || `#${r.assignedDrafterID}`;
+            const desc = (r.description || '').replace(/\s+/g, ' ').trim();
+            const descShort = desc.length > 140 ? desc.slice(0, 140) + '…' : desc;
+
+            tr.innerHTML = `
+            <td>${r.draftingInstructionID}</td>
+            <td class="fw-semibold">${escapeHTML(r.title || '')}</td>
+            <td class="text-muted">${escapeHTML(descShort)}</td>
+            <td>${escapeHTML(dept)}</td>
+            <td>${escapeHTML(drafter)}</td>
+            <td><span class="status-badge status-${(r.status || '').replace(/\s/g, '\\ ')}">${escapeHTML(r.status || '')}</span></td>
+            <td><span class="prio prio-${(r.priority || '').replace(/\s/g, '\\ ')}">${escapeHTML(r.priority || '')}</span></td>
+            <td>${fmtDate(r.receivedDate)}</td>
+            <td class="action-col text-end">
+              <button class="btn btn-sm btn-ghost" data-id="${r.draftingInstructionID}"><i class="bi bi-eye"></i></button>
+            </td>`;
+
+            tr.querySelector('button').addEventListener('click', () => openPreview(r));
+            return tr;
+        }
+
+        function fmtDate(d) { try { const dt = new Date(d); return dt.toLocaleDateString(); } catch { return '—'; } }
+        function escapeHTML(str) { return (str || '').toString().replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m])); }
+
+        // Preview panel
+        const offcanvas = new bootstrap.Offcanvas('#preview');
+        function openPreview(r) {
+            document.getElementById('previewLabel').textContent = `Instruction #${r.draftingInstructionID}`;
+            document.getElementById('pvTitle').textContent = r.title || '—';
+            document.getElementById('pvDesc').textContent = r.description || '—';
+            document.getElementById('pvDept').textContent = DEPARTMENTS.find(d => d.id === r.departmentID)?.name || `Dept #${r.departmentID}`;
+            document.getElementById('pvStatus').textContent = r.status || '—';
+            document.getElementById('pvPriority').textContent = r.priority || '—';
+            document.getElementById('pvMeta').textContent = `Received ${fmtDate(r.receivedDate)} · Drafter ${({ 801: 'Qoane Seitlheko', 802: 'TSepo Kaibe' })[r.assignedDrafterID] || '#' + r.assignedDrafterID}`;
+
+            const filesHost = document.getElementById('pvFiles'); filesHost.innerHTML = '';
+            if (Array.isArray(r.files) && r.files.length) {
+                r.files.forEach(f => { const a = document.createElement('a'); a.href = `/${f.filePath}`; a.target = '_blank'; a.textContent = f.fileName; filesHost.appendChild(a); });
+            } else { filesHost.textContent = '—'; }
+
+            const link = document.getElementById('pvOpenDraft');
+            link.href = 'drafter-dashboard.html';
+            offcanvas.show();
+        }
+
+        // Export CSV (client-side, filtered set)
+        btnExport.addEventListener('click', () => {
+            if (!filtered.length) { return; }
+            const rows = [
+                ['ID', 'Title', 'Description', 'Department', 'Drafter', 'Status', 'Priority', 'Received']
+            ];
+            filtered.forEach(r => {
+                rows.push([
+                    r.draftingInstructionID,
+                    (r.title || '').replace(/\n/g, ' '),
+                    (r.description || '').replace(/\n/g, ' '),
+                    (DEPARTMENTS.find(d => d.id === r.departmentID)?.name || `Dept #${r.departmentID}`),
+                    (({ 801: 'Qoane Seitlheko', 802: 'TSepo Kaibe' })[r.assignedDrafterID] || `#${r.assignedDrafterID}`),
+                    r.status || '', r.priority || '', fmtDate(r.receivedDate)
+                ]);
+            });
+            const csv = rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'instructions.csv'; a.click();
+            URL.revokeObjectURL(url);
         });
-
-      // 3) Fetch instructions from API
-      const feedbackDiv = document.getElementById("feedback");
-      const tbody = document.getElementById("instructionsBody");
-      const noDataDiv = document.getElementById("noData");
-
-      try {
-        const response = await fetch("/api/DraftingInstructions", {
-          headers: { Authorization: "Bearer " + token }
-        });
-
-        if (response.status === 401) {
-          // Unauthorized—redirect to login
-          window.location.href = "login.html";
-          return;
-        }
-        if (!response.ok) {
-          const errorText = await response.text();
-          feedbackDiv.innerHTML = `<div class="alert alert-danger">Error loading instructions: ${errorText}</div>`;
-          return;
-        }
-
-        const instructions = await response.json();
-
-        if (Array.isArray(instructions) && instructions.length > 0) {
-          instructions.forEach((inst) => {
-            const tr = document.createElement("tr");
-
-            // ID
-            const tdId = document.createElement("td");
-            tdId.textContent = inst.draftingInstructionID;
-            tr.appendChild(tdId);
-
-            // Title
-            const tdTitle = document.createElement("td");
-            tdTitle.textContent = inst.title || "";
-            tr.appendChild(tdTitle);
-
-            // Description
-            const tdDesc = document.createElement("td");
-            tdDesc.textContent = inst.description || "";
-            tr.appendChild(tdDesc);
-
-            // DepartmentID
-            const tdDept = document.createElement("td");
-            tdDept.textContent = inst.departmentID;
-            tr.appendChild(tdDept);
-
-            // Assigned Drafter ID
-            const tdDrafter = document.createElement("td");
-            tdDrafter.textContent = inst.assignedDrafterID;
-            tr.appendChild(tdDrafter);
-
-            // Status
-            const tdStatus = document.createElement("td");
-            tdStatus.textContent = inst.status || "";
-            tr.appendChild(tdStatus);
-
-            // Priority
-            const tdPriority = document.createElement("td");
-            tdPriority.textContent = inst.priority || "";
-            tr.appendChild(tdPriority);
-
-            // ReceivedDate (formatted as YYYY-MM-DD)
-            const tdReceived = document.createElement("td");
-            const dateObj = new Date(inst.receivedDate);
-            tdReceived.textContent = dateObj.toISOString().split("T")[0];
-            tr.appendChild(tdReceived);
-
-            // Attachments
-            const tdFiles = document.createElement("td");
-            if (Array.isArray(inst.files) && inst.files.length > 0) {
-              inst.files.forEach((file) => {
-                const link = document.createElement("a");
-                link.href = `/${file.filePath}`;
-                // Because file.filePath is relative to wwwroot (e.g. "uploads/abc.pdf")
-                link.textContent = file.fileName;
-                link.target = "_blank";
-                link.classList.add("d-block", "text-decoration-none");
-                tdFiles.appendChild(link);
-              });
-            } else {
-              tdFiles.textContent = "—";
-            }
-            tr.appendChild(tdFiles);
-
-            tbody.appendChild(tr);
-          });
-        } else {
-          noDataDiv.classList.remove("d-none");
-          // Hide table header if desired
-          document.querySelector("table").classList.add("d-none");
-        }
-      } catch (err) {
-        feedbackDiv.innerHTML = `<div class="alert alert-danger">Unexpected error loading instructions.</div>`;
-        console.error(err);
-      }
-    });
     </script>
 </body>
 </html>

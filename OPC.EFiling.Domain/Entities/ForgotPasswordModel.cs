@@ -8,6 +8,6 @@ namespace OPC.EFiling.Domain.Entities
 {
     public class ForgotPasswordModel
     {
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 }

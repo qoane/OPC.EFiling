@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OPC.EFiling.Domain.Entities;
@@ -12,24 +12,28 @@ using System.Threading.Tasks;
 namespace OPC.EFiling.API.Controllers
 {
     /// <summary>
-    /// A version of DraftsController that integrates the DraftLockService to enforce
-    /// one‑drafter editing and maintain a complete version history.  You can use
-    /// this class as a template when integrating the lock service into your
-    /// existing DraftsController.
+    /// A refactored version of the DraftsController that integrates the DraftLockService
+    /// and records a new draft version on every save or submit.  This controller
+    /// should replace your existing DraftsController once the DraftLockService is
+    /// registered in the DI container.  It also includes TODO hooks for
+    /// notifying the next user in the workflow.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class DraftsController : ControllerBase
+    public class DraftsControllerIntegrated : ControllerBase
     {
         private readonly AppDbContext _context;
         private readonly DraftLockService _lockService;
 
-        public DraftsController(AppDbContext context, DraftLockService lockService)
+        public DraftsControllerIntegrated(AppDbContext context, DraftLockService lockService)
         {
             _context = context;
             _lockService = lockService;
         }
 
+        /// <summary>
+        /// Returns all instructions assigned to the logged‑in drafter.
+        /// </summary>
         [HttpGet("ByDrafter")]
         [Authorize]
         public IActionResult GetAssignedInstructions()
@@ -52,9 +56,14 @@ namespace OPC.EFiling.API.Controllers
             return Ok(assigned);
         }
 
+        /// <summary>
+        /// Submits a completed draft.  This endpoint acquires a lock, creates
+        /// a new draft version, updates the status, saves the changes and releases
+        /// the lock.  It is equivalent to "check in" in a document management system.
+        /// </summary>
         [HttpPost("Submit")]
         [Authorize]
-        public async Task<IActionResult> SubmitDraft([FromBody] DraftSubmissionLockDto dto)
+        public async Task<IActionResult> SubmitDraft([FromBody] DraftSubmissionDto dto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int drafterId))
@@ -62,7 +71,6 @@ namespace OPC.EFiling.API.Controllers
 
             var instruction = await _context.DraftingInstructions
                 .FirstOrDefaultAsync(i => i.DraftingInstructionID == dto.DraftingInstructionID);
-
             if (instruction == null)
                 return NotFound("Instruction not found");
 
@@ -71,11 +79,11 @@ namespace OPC.EFiling.API.Controllers
             if (!lockAcquired)
                 return Conflict("Instruction is currently locked by another user.");
 
-            // Create a new draft record (version) for this submission
+            // Always create a new draft record for this submission
             var draft = new Draft
             {
                 DraftingInstructionID = dto.DraftingInstructionID,
-                ContentHtml = dto.HtmlContent ?? string.Empty, // Fix for CS8601: Ensure non-null assignment
+                ContentHtml = dto.HtmlContent ?? string.Empty, // Fix for CS8601
                 CreatedByUserID = drafterId,
                 CreatedAt = DateTime.UtcNow
             };
@@ -87,9 +95,15 @@ namespace OPC.EFiling.API.Controllers
             // Release the lock once submission completes
             await _lockService.ReleaseLockAsync(dto.DraftingInstructionID, drafterId);
 
+            // TODO: send notification to the next person in the workflow (e.g. Registrar or PC)
+
             return Ok(new { message = "Draft submitted successfully." });
         }
 
+        /// <summary>
+        /// Returns the latest draft for editing.  If another user holds the lock,
+        /// this endpoint returns a 409 Conflict.
+        /// </summary>
         [HttpGet("ByInstruction/{id}")]
         [Authorize]
         public async Task<IActionResult> GetDraftByInstruction(int id)
@@ -119,9 +133,14 @@ namespace OPC.EFiling.API.Controllers
             });
         }
 
+        /// <summary>
+        /// Saves a draft without submitting it.  A new draft record is created
+        /// each time, preserving a version history.  The lock remains in place
+        /// so the user can continue editing.
+        /// </summary>
         [HttpPost("Save")]
         [Authorize]
-        public async Task<IActionResult> SaveDraft([FromBody] DraftSubmissionLockDto dto)
+        public async Task<IActionResult> SaveDraft([FromBody] DraftSubmissionDto dto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int drafterId))
@@ -132,11 +151,11 @@ namespace OPC.EFiling.API.Controllers
             if (!lockAcquired)
                 return Conflict("Instruction is currently locked by another user.");
 
-            // Always create a new draft record to preserve a version history
+            // Always create a new draft record to preserve version history
             var newDraft = new Draft
             {
                 DraftingInstructionID = dto.DraftingInstructionID,
-                ContentHtml = dto.HtmlContent ?? string.Empty, // Fix for CS8601: Ensure non-null assignment
+                ContentHtml = dto.HtmlContent ?? string.Empty, // Fix for CS8601
                 CreatedByUserID = drafterId,
                 CreatedAt = DateTime.UtcNow
             };
@@ -147,6 +166,9 @@ namespace OPC.EFiling.API.Controllers
             return Ok(new { message = "Draft saved successfully." });
         }
 
+        /// <summary>
+        /// Returns all drafting instructions.  Useful for administrative views.
+        /// </summary>
         [HttpGet("All")]
         [Authorize]
         public IActionResult GetAllInstructions()
@@ -160,11 +182,13 @@ namespace OPC.EFiling.API.Controllers
                     d.ReceivedDate
                 })
                 .ToList();
-
             return Ok(instructions);
         }
 
-        public class DraftSubmissionLockDto
+        /// <summary>
+        /// Payload for saving or submitting a draft.
+        /// </summary>
+        public class DraftSubmissionDto
         {
             public int DraftingInstructionID { get; set; }
             public string? HtmlContent { get; set; }

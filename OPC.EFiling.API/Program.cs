@@ -14,6 +14,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddScoped<DraftLockService>();
+builder.Services.AddHostedService<LockCleanupService>();
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -100,6 +104,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -125,5 +131,7 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.SeedRolesAsync(roleManager);
     await DbInitializer.SeedAdminUserAsync(userManager);
 }
+
+
 
 app.Run();
