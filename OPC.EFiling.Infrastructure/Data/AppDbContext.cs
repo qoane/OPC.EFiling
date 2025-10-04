@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using OPC.EFiling.Domain.Entities;
+using OPC.EFiling.Infrastructure.Data.Configurations;
 
 namespace OPC.EFiling.Infrastructure.Data
 {
@@ -12,10 +13,8 @@ namespace OPC.EFiling.Infrastructure.Data
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
 
-        // Existing set
+        // Existing sets
         public DbSet<DraftingInstruction> DraftingInstructions { get; set; }
-
-        // Add these two new DbSet lines:
         public DbSet<InstructionAttachment> InstructionAttachments { get; set; }
         public DbSet<Draft> Drafts { get; set; }
 
@@ -28,9 +27,20 @@ namespace OPC.EFiling.Infrastructure.Data
         public DbSet<InstructionLock> InstructionLocks { get; set; }
         public DbSet<DraftVersion> DraftVersions { get; set; }
 
+        // Circulation-related sets
+        /// <summary>
+        /// Table storing each time a draft is circulated to a ministry.
+        /// </summary>
+        public DbSet<CirculationLog> CirculationLogs { get; set; }
+
+        /// <summary>
+        /// Table storing responses from ministries for each circulation log entry.
+        /// </summary>
+        public DbSet<CirculationResponse> CirculationResponses { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(modelBuilder);
 
             // ── One-to-many: DraftingInstruction → InstructionAttachment
             modelBuilder.Entity<InstructionAttachment>()
@@ -58,9 +68,11 @@ namespace OPC.EFiling.Infrastructure.Data
                 .HasForeignKey(l => l.DraftingInstructionID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // If you have any existing relationships to configure (e.g. for Documents or UploadedFile),
-            // you can keep them here as well.
-        }
+            // Apply explicit configurations for circulation entities.
+            modelBuilder.ApplyConfiguration(new CirculationLogConfiguration());
+            modelBuilder.ApplyConfiguration(new CirculationResponseConfiguration());
 
+            // Additional model configuration can remain here.
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace OPC.EFiling.Application.DTOs
+namespace OPC.EFiling.Application.DTOs
 {
     public class SendDraftRequestDto
     {

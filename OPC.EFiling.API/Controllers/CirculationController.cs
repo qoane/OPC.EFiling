@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -117,13 +117,31 @@ namespace OPC.EFiling.API.Controllers
                 attachmentMime: "application/pdf"
             );
 
+            // 5) Record circulation log for auditing and version history
+            var circulationLog = new CirculationLog
+            {
+                DraftId = draft.DraftID,
+                VersionLabel = versionLabel,
+                SentToEmail = dto.ToEmail.Trim(),
+                CcEmail = string.IsNullOrWhiteSpace(dto.CcEmail) ? null : dto.CcEmail.Trim(),
+                Subject = subject,
+                SentAt = DateTime.UtcNow,
+                SentByUserId = userId,
+                Notes = string.IsNullOrWhiteSpace(dto.Notes) ? null : dto.Notes!.Trim(),
+                DocumentId = document.DocumentID
+            };
+
+            _db.Set<CirculationLog>().Add(circulationLog);
+            await _db.SaveChangesAsync();
+
             return Ok(new
             {
                 message = "Draft sent successfully.",
                 draftId = draft.DraftID,
                 documentId = document.DocumentID,
                 uploadedFileId = uploaded.UploadedFileID,
-                path = uploaded.FilePath
+                path = uploaded.FilePath,
+                circulationLogId = circulationLog.CirculationLogId
             });
         }
 
@@ -160,6 +178,82 @@ namespace OPC.EFiling.API.Controllers
             var claim = User?.Claims?.FirstOrDefault(c => c.Type == "sub" || c.Type.EndsWith("/nameidentifier"));
             if (claim != null && int.TryParse(claim.Value, out var id)) return id;
             return null;
+        }
+
+        /// <summary>
+        /// Record a response from a ministry for a given circulation log.  Since external
+        /// actors cannot log into the system, registry staff call this endpoint after
+        /// receiving comments via email and optionally uploading an annotated PDF.
+        /// </summary>
+        [HttpPost("response/{circulationLogId:int}")]
+        public async Task<IActionResult> RecordResponse(int circulationLogId, [FromBody] RecordResponseDto dto)
+        {
+            var log = await _db.Set<CirculationLog>()
+                .FirstOrDefaultAsync(l => l.CirculationLogId == circulationLogId);
+            if (log == null)
+            {
+                return NotFound("Circulation log not found.");
+            }
+
+            var userId = GetCurrentUserIdOrNull() ?? 0;
+
+            var response = new CirculationResponse
+            {
+                CirculationLogId = circulationLogId,
+                ResponseText = string.IsNullOrWhiteSpace(dto.ResponseText) ? null : dto.ResponseText!.Trim(),
+                DocumentId = dto.DocumentId,
+                ReceivedAt = DateTime.UtcNow,
+                ReceivedByUserId = userId
+            };
+
+            _db.Set<CirculationResponse>().Add(response);
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Response recorded successfully.",
+                circulationLogId = circulationLogId,
+                responseId = response.CirculationResponseId
+            });
+        }
+
+        /// <summary>
+        /// Retrieve all circulation logs and responses for a given draft.  This allows
+        /// drafters and registry staff to see the history of sends and feedback cycles.
+        /// </summary>
+        [HttpGet("logs/{draftId:int}")]
+        public async Task<IActionResult> GetCirculationLogs(int draftId)
+        {
+            var logs = await _db.Set<CirculationLog>()
+                .Where(l => l.DraftId == draftId)
+                .OrderByDescending(l => l.SentAt)
+                .Select(l => new
+                {
+                    l.CirculationLogId,
+                    l.VersionLabel,
+                    l.SentToEmail,
+                    l.CcEmail,
+                    l.Subject,
+                    l.SentAt,
+                    l.SentByUserId,
+                    l.Notes,
+                    l.DocumentId,
+                    Responses = _db.Set<CirculationResponse>()
+                        .Where(r => r.CirculationLogId == l.CirculationLogId)
+                        .OrderBy(r => r.ReceivedAt)
+                        .Select(r => new
+                        {
+                            r.CirculationResponseId,
+                            r.ResponseText,
+                            r.DocumentId,
+                            r.ReceivedAt,
+                            r.ReceivedByUserId
+                        })
+                        .ToList()
+                })
+                .ToListAsync();
+
+            return Ok(logs);
         }
     }
 }
