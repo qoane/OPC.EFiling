@@ -235,22 +235,75 @@
     <div class="orb nude size-sm animate-float" style="top:40%; left:10%"></div>
 
     <!-- NAVBAR -->
+    <!-- Global navigation with role-based visibility -->
     <nav class="navbar navbar-expand-lg glassy fixed-top">
         <div class="container">
-            <a class="navbar-brand brand-mark" href="dashboard.html">
-                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" alt="Lesotho Coat of Arms">
-                <span>OPC <span class="text-primary">E-Filing</span></span>
+            <a class="navbar-brand brand-mark" href="index.html">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" alt="Lesotho Coat of Arms" />
+                <span>OPC <span class="text-primary">E‑Filing</span></span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="nav">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-                    <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-people me-1"></i>User Management</a></li>
+                    <li class="nav-item" data-roles="All"><a class="nav-link" href="dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter"><a class="nav-link" href="tasks.html"><i class="bi bi-list-check me-1"></i>My Tasks</a></li>
+                    <li class="nav-item" data-roles="MDA"><a class="nav-link" href="submit-instruction.html"><i class="bi bi-plus-circle me-1"></i>New Instruction</a></li>
+                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="instructions.html"><i class="bi bi-card-list me-1"></i>Instructions</a></li>
+                    <li class="nav-item" data-roles="PC"><a class="nav-link" href="pc-allocation.html"><i class="bi bi-person-plus me-1"></i>PC Allocation</a></li>
+                    <li class="nav-item" data-roles="RegistryOfficer"><a class="nav-link" href="registry-logging.html"><i class="bi bi-archive me-1"></i>Registry Logging</a></li>
+                    <li class="nav-item" data-roles="PC"><a class="nav-link" href="circulation.html"><i class="bi bi-send me-1"></i>Circulation</a></li>
+                    <li class="nav-item" data-roles="PC,Admin"><a class="nav-link" href="templates.html"><i class="bi bi-layout-text-window me-1"></i>Templates</a></li>
+                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="search.html"><i class="bi bi-search me-1"></i>Search</a></li>
+                    <li class="nav-item" data-roles="Admin"><a class="nav-link active" aria-current="page" href="manage-users.html"><i class="bi bi-people me-1"></i>User Management</a></li>
                     <li class="nav-item"><a class="nav-link" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
     </nav>
+    <!-- Dynamic navigation script: hide menu items based on roles and attach logout confirmation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('jwtToken');
+            let roles = [];
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1] || '')) || {};
+                    const keys = ['role','roles','http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+                    keys.forEach(k => {
+                        const v = payload[k];
+                        if (Array.isArray(v)) roles = roles.concat(v);
+                        else if (typeof v === 'string') roles.push(v);
+                    });
+                } catch {}
+            }
+            roles = roles.map(r => String(r));
+            document.querySelectorAll('[data-roles]').forEach(el => {
+                const allowed = el.getAttribute('data-roles').split(',').map(s => s.trim());
+                if (!allowed.includes('All') && !allowed.some(r => roles.includes(r))) {
+                    el.style.display = 'none';
+                }
+            });
+            const current = location.pathname.split('/').pop();
+            document.querySelectorAll('nav .nav-link[href]').forEach(link => {
+                if (link.getAttribute('href') === current) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current','page');
+                }
+            });
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to log out?')) {
+                        localStorage.removeItem('jwtToken');
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+        });
+    </script>
 
     <!-- HEADER -->
     <header class="page-header">
@@ -355,22 +408,6 @@
         </div>
     </div>
 
-    <!-- LOGOUT MODAL (solid) -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content solid">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">Are you sure you want to log out?</div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmLogout">Logout</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <footer class="py-4 mt-auto">
         <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
@@ -436,10 +473,8 @@
         const pageNum = document.getElementById('pageNum');
         const pageTotal = document.getElementById('pageTotal');
         const adminModal = new bootstrap.Modal(document.getElementById('adminModal'));
-        const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
 
-        document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); logoutModal.show(); });
-        document.getElementById('confirmLogout').addEventListener('click', () => { localStorage.removeItem('jwtToken'); window.location.href = 'login.html'; });
+        // Attach create admin and add user handlers
         document.getElementById('btnCreateAdmin').addEventListener('click', () => adminModal.show());
         document.getElementById('btnCreate').addEventListener('click', addInlineRow);
 

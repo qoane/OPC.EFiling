@@ -38,6 +38,13 @@ namespace OPC.EFiling.Infrastructure.Data
         /// </summary>
         public DbSet<CirculationResponse> CirculationResponses { get; set; }
 
+        // Template sets
+        /// <summary>
+        /// Stores drafting templates uploaded by administrators or parliamentary counsel. Templates provide starting
+        /// documents for new instructions.
+        /// </summary>
+        public DbSet<Template> Templates { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
         base.OnModelCreating(modelBuilder);
@@ -68,9 +75,10 @@ namespace OPC.EFiling.Infrastructure.Data
                 .HasForeignKey(l => l.DraftingInstructionID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Apply explicit configurations for circulation entities.
+            // Apply explicit configurations for circulation entities and templates.
             modelBuilder.ApplyConfiguration(new CirculationLogConfiguration());
             modelBuilder.ApplyConfiguration(new CirculationResponseConfiguration());
+            modelBuilder.ApplyConfiguration(new TemplateConfiguration());
 
             // Additional model configuration can remain here.
         }
