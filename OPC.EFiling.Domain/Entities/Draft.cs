@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,5 +19,12 @@ namespace OPC.EFiling.Domain.Entities
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastModifiedAt { get; set; }
+
+        /// <summary>
+        /// Collection of circulation log entries created whenever this draft is
+        /// exported and sent to a ministry.  Each log represents a single send
+        /// event and can have zero or more responses recorded against it.
+        /// </summary>
+        public ICollection<CirculationLog> CirculationLogs { get; set; } = new List<CirculationLog>();
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OPC.EFiling.Domain.Entities;
 
@@ -18,7 +18,8 @@ namespace OPC.EFiling.Infrastructure.Data.Configurations
             b.Property(x => x.Notes).HasMaxLength(2000);
 
             b.HasOne(x => x.Draft)
-                .WithMany() // or .WithMany(d => d.CirculationLogs) if you add a collection on Draft
+                // Use the CirculationLogs collection on Draft to establish the inverse relationship
+                .WithMany(d => d.CirculationLogs)
                 .HasForeignKey(x => x.DraftId)
                 .OnDelete(DeleteBehavior.Cascade);
 
