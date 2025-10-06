@@ -147,73 +147,18 @@
             <div class="collapse navbar-collapse" id="nav">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                     <li class="nav-item" data-roles="All"><a class="nav-link" href="dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
-                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="instructions.html"><i class="bi bi-card-list me-1"></i>Instructions</a></li>
                     <li class="nav-item" data-roles="All"><a class="nav-link active" aria-current="page" href="tasks.html"><i class="bi bi-list-check me-1"></i>My Tasks</a></li>
-                    <li class="nav-item" data-roles="MDA"><a class="nav-link" href="submit-instruction.html"><i class="bi bi-plus-circle me-1"></i>New Instruction</a></li>
-                    <li class="nav-item" data-roles="PC"><a class="nav-link" href="pc-allocation.html"><i class="bi bi-person-plus me-1"></i>PC Allocation</a></li>
-                    <li class="nav-item" data-roles="RegistryOfficer"><a class="nav-link" href="registry-logging.html"><i class="bi bi-archive me-1"></i>Registry Logging</a></li>
-                    <li class="nav-item" data-roles="Drafter"><a class="nav-link" href="drafter-dashboard.html"><i class="bi bi-journal-text me-1"></i>Drafter Dashboard</a></li>
-                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="search.html"><i class="bi bi-search me-1"></i>Search</a></li>
-                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="templates.html"><i class="bi bi-layout-text-window me-1"></i>Templates</a></li>
-                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="circulation.html"><i class="bi bi-send me-1"></i>Circulation</a></li>
-                    <li class="nav-item" data-roles="Admin"><a class="nav-link" href="manage-users.html"><i class="bi bi-people me-1"></i>User Management</a></li>
+                    <li class="nav-item" data-roles="All"><a class="nav-link" href="timeline.html"><i class="bi bi-clock-history me-1"></i>Timeline</a></li>
+                    <li class="nav-item" data-roles="SeniorPC,Admin"><a class="nav-link" href="signatures.html"><i class="bi bi-pencil-square me-1"></i>Signatures</a></li>
+                    <!-- Notification / Messages / Tasks icons with badges -->
+                    <li class="nav-item position-relative" id="navNotifications" data-roles="Drafter,PC,RegistryOfficer,SeniorPC,Admin"><a class="nav-link" href="#"><i class="bi bi-bell"></i><span class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle" style="font-size:.6rem;" id="notifCount">0</span></a></li>
+                    <li class="nav-item position-relative" id="navMessages"><a class="nav-link" href="#"><i class="bi bi-envelope"></i><span class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle" style="font-size:.6rem;" id="msgCount">0</span></a></li>
+                    <li class="nav-item position-relative" id="navTaskIcon" data-roles="All"><a class="nav-link" href="tasks.html"><i class="bi bi-check-circle"></i><span class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle" style="font-size:.6rem;" id="taskCount">0</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    <!-- Dynamic nav script to hide items based on roles and handle logout -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const token = localStorage.getItem('jwtToken');
-            if (!token) {
-                // redirect to login if not authenticated
-                window.location.href = 'login.html';
-                return;
-            }
-            let roles = [];
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1] || '')) || {};
-                const keys = ['role','roles','http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-                keys.forEach(k => {
-                    const v = payload[k];
-                    if (Array.isArray(v)) roles = roles.concat(v);
-                    else if (typeof v === 'string') roles.push(v);
-                });
-            } catch (err) {
-                console.error(err);
-            }
-            roles = roles.map(r => String(r));
-            document.querySelectorAll('[data-roles]').forEach(item => {
-                const allowed = item.getAttribute('data-roles').split(',').map(s => s.trim());
-                if (!allowed.includes('All') && !allowed.some(r => roles.includes(r))) {
-                    item.style.display = 'none';
-                }
-            });
-            // highlight current link
-            const current = location.pathname.split('/').pop();
-            document.querySelectorAll('nav .nav-link').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === current) {
-                    link.classList.add('active');
-                    link.setAttribute('aria-current','page');
-                } else {
-                    link.classList.remove('active');
-                    link.removeAttribute('aria-current');
-                }
-            });
-            const logout = document.getElementById('logoutLink');
-            if (logout) {
-                logout.addEventListener('click', e => {
-                    e.preventDefault();
-                    if (confirm('Are you sure you want to logout?')) {
-                        localStorage.removeItem('jwtToken');
-                        window.location.href = 'login.html';
-                    }
-                });
-            }
-        });
-    </script>
 
     <!-- Hero section -->
     <section class="page-hero">
@@ -225,7 +170,7 @@
                     <p class="mb-0">View and take action on the instructions assigned to you.</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="submit-instruction.html" class="btn btn-flag" data-roles="MDA"><i class="bi bi-plus-circle me-1"></i>New Instruction</a>
+                    <a href="submit-instruction.html" class="btn btn-flag"><i class="bi bi-plus-circle me-1"></i>New Instruction</a>
                     <a href="dashboard.html" class="btn btn-ghost"><i class="bi bi-arrow-return-left me-1"></i>Back to Dashboard</a>
                 </div>
             </div>
@@ -288,22 +233,6 @@
         </div>
     </div>
 
-    <!-- Logout Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glass">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Logout</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">Are you sure you want to log out?</div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmLogout">Logout</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -314,114 +243,103 @@
         document.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('jwtToken');
             if (!token) { window.location.href = 'login.html'; return; }
-            // parse JWT to extract roles
-            let roles = [];
-            let payload = {};
-            try {
-                payload = JSON.parse(atob(token.split('.')[1] || '')) || {};
-                roles = payload.role ? [payload.role] : payload.roles || [];
-            } catch { /* ignore */ }
-
-            // handle logout
-            const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
-            document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); logoutModal.show(); });
-            document.getElementById('confirmLogout').addEventListener('click', () => {
-                localStorage.removeItem('jwtToken'); window.location.href = 'login.html';
-            });
-
             const tasksBody = document.getElementById('tasksBody');
             const searchInput = document.getElementById('searchInput');
 
-            // Data caches
-            let allInstructions = [];
-            let drafterUsers = [];
-
-            // Fetch all users to populate drafter list (only once)
-            function fetchDrafters() {
-                return fetch('/api/Users', { headers: { Authorization: 'Bearer ' + token } })
-                    .then(res => res.ok ? res.json() : Promise.reject(res))
-                    .then(users => {
-                        drafterUsers = users.filter(u => (u.roles || []).includes('Drafter'));
-                    })
-                    .catch(() => { drafterUsers = []; });
+            // Load navigation counts for notifications, messages and tasks
+            async function loadNavCounts() {
+                try {
+                    const res = await fetch('/api/Dashboard/UserCounts', { headers: { Authorization: 'Bearer ' + token } });
+                    if (!res.ok) return;
+                    const counts = await res.json();
+                    document.getElementById('notifCount').textContent = counts.notifications ?? counts.Notifications ?? 0;
+                    document.getElementById('msgCount').textContent = counts.messages ?? counts.Messages ?? 0;
+                    document.getElementById('taskCount').textContent = counts.tasks ?? counts.Tasks ?? 0;
+                } catch (e) { }
             }
 
-            // Fetch all instructions
-            function fetchInstructions() {
-                return fetch('/api/DraftingInstructions', { headers: { Authorization: 'Bearer ' + token } })
-                    .then(res => res.ok ? res.json() : Promise.reject(res))
-                    .then(data => { allInstructions = data; })
-                    .catch(() => { allInstructions = []; });
-            }
-
-            // Determine if a given instruction is relevant to current user based on status & role
-            function isMyTask(instr) {
-                const status = (instr.status || '').toLowerCase();
-                if (roles.includes('RegistryOfficer')) {
-                    return status === 'submitted';
-                }
-                if (roles.includes('PC')) {
-                    return status === 'logged' || status === 'draft submitted' || status === 'returned';
-                }
-                if (roles.includes('Drafter')) {
-                    // Show assigned or returned drafts belonging to the logged in drafter
-                    const myUserId = payload?.nameid || payload?.sub;
-                    return (status === 'assigned' || status === 'returned') && instr.assignedDrafterID == myUserId;
-                }
-                return false;
-            }
-
-            // Render the tasks table
-            function renderTasks() {
-                const term = searchInput.value.trim().toLowerCase();
-                const tasks = allInstructions.filter(isMyTask).filter(instr => {
-                    if (!term) return true;
-                    return (instr.title || '').toLowerCase().includes(term) || (instr.status || '').toLowerCase().includes(term);
+            // Hide nav items based on roles stored in the JWT token
+            function applyRoleVisibility() {
+                document.querySelectorAll('[data-roles]').forEach(el => {
+                    const allowed = el.getAttribute('data-roles').split(',').map(s => s.trim());
+                    if (!allowed.includes('All') && !allowed.some(r => roles.includes(r))) {
+                        el.style.display = 'none';
+                    }
                 });
-                if (tasks.length === 0) {
-                    tasksBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No tasks found.</td></tr>';
+            }
+
+            // Decode JWT payload to get roles
+            let roles = [];
+            let payload = {};
+            try {
+                payload = JSON.parse(atob((token.split('.')[1] || '')));
+                const roleClaims = ['role','roles','http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+                roleClaims.forEach(k => {
+                    const v = payload[k];
+                    if (Array.isArray(v)) roles = roles.concat(v);
+                    else if (typeof v === 'string') roles.push(v);
+                });
+            } catch (e) { roles = []; }
+
+            applyRoleVisibility();
+
+            // Fetch tasks for the current user
+            function fetchTasks() {
+                return fetch('/api/tasks/user', { headers: { Authorization: 'Bearer ' + token } })
+                    .then(res => res.ok ? res.json() : Promise.reject(res))
+                    .catch(() => []);
+            }
+
+            // Render tasks table based on API results
+            function renderTasksTable(tasks) {
+                const term = searchInput.value.trim().toLowerCase();
+                const filtered = tasks.filter(t => {
+                    if (!term) return true;
+                    return (t.Title || '').toLowerCase().includes(term) || (t.TaskType || '').toLowerCase().includes(term);
+                });
+                if (filtered.length === 0) {
+                    tasksBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No tasks found.</td></tr>';
                     return;
                 }
                 tasksBody.innerHTML = '';
-                tasks.forEach(instr => {
+                filtered.forEach(t => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${instr.title || '(no title)'}</td>
-                        <td>${instr.departmentID ?? ''}</td>
-                        <td>${instr.status || ''}</td>
-                        <td>${instr.priority || ''}</td>
-                        <td>${new Date(instr.receivedDate).toLocaleDateString()}</td>
+                        <td>${t.Title || '(no title)'}</td>
+                        <td>${t.TaskType || ''}</td>
+                        <td>${t.Status || ''}</td>
+                        <td>${new Date(t.CreatedAt).toLocaleDateString()}</td>
                         <td></td>`;
                     const actionCell = tr.lastElementChild;
-                    // Determine action depending on status & role
-                    const status = (instr.status || '').toLowerCase();
-                    if (roles.includes('RegistryOfficer') && status === 'submitted') {
-                        // Registry: mark as logged
-                        const btn = document.createElement('button');
-                        btn.className = 'btn btn-sm btn-primary';
-                        btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Mark Logged';
-                        btn.addEventListener('click', () => markLogged(instr.draftingInstructionID));
-                        actionCell.appendChild(btn);
-                    } else if (roles.includes('PC') && status === 'logged') {
-                        // PC: assign drafter
-                        const btn = document.createElement('button');
-                        btn.className = 'btn btn-sm btn-primary';
-                        btn.innerHTML = '<i class="bi bi-person-plus me-1"></i>Assign';
-                        btn.addEventListener('click', () => showAssignModal(instr.draftingInstructionID));
-                        actionCell.appendChild(btn);
-                    } else if (roles.includes('PC') && status === 'draft submitted') {
-                        // PC: review draft (open drafter dashboard read‑only or maybe new page)
-                        const link = document.createElement('a');
-                        link.className = 'btn btn-sm btn-warning';
-                        link.innerHTML = '<i class="bi bi-eye me-1"></i>Review';
-                        link.href = `drafter-dashboard.html?instructionId=${instr.draftingInstructionID}`;
-                        actionCell.appendChild(link);
-                    } else if (roles.includes('Drafter') && (status === 'assigned' || status === 'returned')) {
+                    // Determine action based on task type
+                    if (t.TaskType === 'Draft') {
                         const link = document.createElement('a');
                         link.className = 'btn btn-sm btn-success';
                         link.innerHTML = '<i class="bi bi-pencil-square me-1"></i>Edit';
-                        link.href = `drafter-dashboard.html?instructionId=${instr.draftingInstructionID}`;
+                        link.href = `drafter-dashboard.html`; // optional: pass instructionId via query
                         actionCell.appendChild(link);
+                    } else if (t.TaskType === 'Registry Logging') {
+                        const link = document.createElement('a');
+                        link.className = 'btn btn-sm btn-primary';
+                        link.innerHTML = '<i class="bi bi-archive me-1"></i>Log';
+                        link.href = 'registry-logging.html';
+                        actionCell.appendChild(link);
+                    } else if (t.TaskType === 'PC Review' || t.TaskType === 'Approval') {
+                        const link = document.createElement('a');
+                        link.className = 'btn btn-sm btn-warning';
+                        link.innerHTML = '<i class="bi bi-eye me-1"></i>Review';
+                        link.href = 'seniorpc-review.html';
+                        actionCell.appendChild(link);
+                    } else if (t.TaskType === 'Ministry Response') {
+                        const span = document.createElement('span');
+                        span.className = 'text-muted';
+                        span.textContent = 'Respond via Email';
+                        actionCell.appendChild(span);
+                    } else if (t.TaskType === 'Admin Comment') {
+                        const span = document.createElement('span');
+                        span.className = 'text-muted';
+                        span.textContent = 'Follow up';
+                        actionCell.appendChild(span);
                     } else {
                         actionCell.textContent = '-';
                     }
@@ -429,55 +347,34 @@
                 });
             }
 
-            // Assign drafter via modal
-            const assignModalEl = document.getElementById('assignModal');
-            const assignModal = new bootstrap.Modal(assignModalEl);
-            const drafterSelect = document.getElementById('drafterSelect');
-            const assignInstructionIdInput = document.getElementById('assignInstructionId');
-            document.getElementById('assignConfirmBtn').addEventListener('click', () => {
-                const instrId = parseInt(assignInstructionIdInput.value);
-                const drafterId = parseInt(drafterSelect.value);
-                if (!instrId || !drafterId) return;
-                assignDrafter(instrId, drafterId);
+            // Initial load and search handler
+            function loadTasks() {
+                fetchTasks().then(data => {
+                    renderTasksTable(data);
+                });
+            }
+
+            // Search input listener
+            searchInput.addEventListener('input', () => {
+                fetchTasks().then(renderTasksTable);
             });
 
-            function showAssignModal(instructionId) {
-                assignInstructionIdInput.value = instructionId;
-                // Populate drafters
-                drafterSelect.innerHTML = drafterUsers.map(u => `<option value="${u.userID}">${u.fullName || u.userName}</option>`).join('');
-                assignModal.show();
-            }
+            // Logout handler
+            document.getElementById('logoutLink').addEventListener('click', e => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    localStorage.removeItem('jwtToken');
+                    window.location.href = 'login.html';
+                }
+            });
 
-            // API calls
-            function markLogged(instructionId) {
-                if (!confirm('Mark this instruction as logged?')) return;
-                fetch(`/api/RegistryLogging/MarkLogged/${instructionId}`, { method: 'PUT', headers: { Authorization: 'Bearer ' + token } })
-                    .then(res => res.ok ? res.json() : Promise.reject(res))
-                    .then(() => { alert('Instruction marked as logged.'); fetchAndRender(); })
-                    .catch(() => { alert('Failed to mark logged.'); });
-            }
-
-            function assignDrafter(instructionId, drafterId) {
-                assignModal.hide();
-                // use workflow endpoint to send email when assigning
-                fetch('/api/InstructionWorkflow/AssignToDrafter', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-                    body: JSON.stringify({ instructionId: instructionId, userId: drafterId })
-                })
-                    .then(res => res.ok ? res.json() : Promise.reject(res))
-                    .then(() => { alert('Drafter assigned successfully.'); fetchAndRender(); })
-                    .catch(() => { alert('Failed to assign drafter.'); });
-            }
-
-            // Fetch and render tasks
-            function fetchAndRender() {
-                Promise.all([fetchInstructions(), fetchDrafters()]).then(renderTasks);
-            }
-
-            searchInput.addEventListener('input', renderTasks);
-
-            fetchAndRender();
+            // Refresh tasks and nav counts periodically
+            loadTasks();
+            loadNavCounts();
+            setInterval(() => {
+                loadTasks();
+                loadNavCounts();
+            }, 60000);
         });
     </script>
 </body>
