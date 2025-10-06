@@ -45,6 +45,19 @@ namespace OPC.EFiling.Infrastructure.Data
         /// </summary>
         public DbSet<Template> Templates { get; set; }
 
+        /// <summary>
+        /// Stores threaded comments on drafting instructions. Comments persist across draft versions
+        /// and support replies for conversation-like review threads.
+        /// </summary>
+        public DbSet<Comment> Comments { get; set; }
+
+        /// <summary>
+        /// Stores captured signatures for final approval. Each signature is
+        /// attached to a drafting instruction and includes the signer's name
+        /// and a base64 encoded image.
+        /// </summary>
+        public DbSet<Signature> Signatures { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
         base.OnModelCreating(modelBuilder);
@@ -79,6 +92,12 @@ namespace OPC.EFiling.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new CirculationLogConfiguration());
             modelBuilder.ApplyConfiguration(new CirculationResponseConfiguration());
             modelBuilder.ApplyConfiguration(new TemplateConfiguration());
+
+            // Apply configuration for signatures
+            modelBuilder.ApplyConfiguration(new SignatureConfiguration());
+
+            // Comments configuration
+            modelBuilder.ApplyConfiguration(new CommentConfiguration());
 
             // Additional model configuration can remain here.
         }

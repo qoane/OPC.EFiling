@@ -1,0 +1,243 @@
+<!-- Reusable Comments Sidebar Component -->
+<style>
+/* Sidebar container */
+.comments-sidebar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 360px;
+    max-width: 100%;
+    background: #f8f9fa;
+    border-left: 1px solid #e5e7eb;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.comments-header {
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.comments-header .title { font-size: 1rem; }
+.comments-header .close-btn {
+    border: none;
+    background: transparent;
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+/* Comment list */
+.comments-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+.comment-item {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+.comment-item.resolved {
+    opacity: 0.6;
+}
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #fff;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+.comment-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+.comment-text {
+    margin-top: 0.25rem;
+    white-space: pre-wrap;
+}
+.comment-actions {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #0c4ad4;
+    cursor: pointer;
+    user-select: none;
+}
+.comment-actions span { margin-right: 1rem; }
+.comment-replies {
+    margin-left: 2.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Add comment box */
+.comment-add {
+    border-top: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+}
+.comment-add textarea {
+    width: 100%;
+    resize: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+.comment-add button {
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    background: #0c4ad4;
+    color: #ffffff;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+</style>
+
+<div class="comments-sidebar" id="commentsSidebar">
+    <div class="comments-header">
+        <span class="title">Comments</span>
+        <button class="close-btn" onclick="toggleCommentsSidebar(false)">&times;</button>
+    </div>
+    <div class="comments-body" id="commentsList"></div>
+    <div class="comment-add">
+        <textarea id="newCommentText" rows="3" placeholder="Add a comment…"></textarea>
+        <button onclick="submitComment()">Add Comment</button>
+    </div>
+</div>
+
+<script>
+// Comments sidebar script. Requires global variables instructionId and API token
+// to be defined by the page that includes this component. Also relies on
+// functions toggleCommentsSidebar() and highlightSelection() to be defined.
+
+if (!window.comments) {
+  window.comments = {};
+}
+
+async function loadCommentsSidebar(instructionId) {
+  window.comments.instructionId = instructionId;
+  await refreshComments();
+}
+
+function toggleCommentsSidebar(show) {
+  const sidebar = document.getElementById('commentsSidebar');
+  if (show === undefined) show = sidebar.style.display === 'none';
+  sidebar.style.display = show ? 'flex' : 'none';
+}
+
+async function refreshComments() {
+  const list = document.getElementById('commentsList');
+  list.innerHTML = '<div class="text-muted small">Loading…</div>';
+  const id = window.comments.instructionId;
+  if (!id) return;
+  try {
+    const res = await fetch(`/api/Comments/${id}`, { headers: { Authorization: 'Bearer ' + (localStorage.getItem('jwtToken') || '') } });
+    const comments = await res.json();
+    list.innerHTML = '';
+    comments.forEach(c => list.appendChild(renderComment(c)));
+  } catch {
+    list.innerHTML = '<div class="text-danger small">Failed to load comments</div>';
+  }
+}
+
+function renderComment(c) {
+  const container = document.createElement('div');
+  container.className = 'comment-item' + (c.isResolved ? ' resolved' : '');
+  // Avatar
+  const avatar = document.createElement('div');
+  avatar.className = 'comment-avatar';
+  const initials = (c.authorName || '??').split(' ').map(s => s.charAt(0)).join('').substring(0,2).toUpperCase();
+  avatar.textContent = initials;
+  // simple color based on hash
+  const colorIdx = Math.abs(initials.charCodeAt(0) + initials.charCodeAt(initials.length - 1)) % 5;
+  const colors = ['#0c4ad4','#1f8a43','#e63946','#ff9f1c','#6a4c93'];
+  avatar.style.backgroundColor = colors[colorIdx];
+  // meta
+  const meta = document.createElement('div');
+  meta.className = 'comment-meta';
+  const createdAt = new Date(c.createdAt);
+  const dateStr = createdAt.toLocaleDateString() + ' · ' + createdAt.toLocaleTimeString();
+  meta.textContent = `${c.authorName} · ${dateStr}`;
+  // text
+  const text = document.createElement('div');
+  text.className = 'comment-text';
+  text.textContent = c.text;
+  // actions
+  const actions = document.createElement('div');
+  actions.className = 'comment-actions';
+  const reply = document.createElement('span');
+  reply.textContent = 'Reply';
+  reply.onclick = () => showReplyBox(c.commentId);
+  const resolve = document.createElement('span');
+  resolve.textContent = 'Resolve';
+  resolve.onclick = () => resolveComment(c.commentId);
+  actions.appendChild(reply);
+  if (!c.isResolved) actions.appendChild(resolve);
+  // wrapper row
+  const row = document.createElement('div');
+  row.style.display = 'flex';
+  row.style.alignItems = 'flex-start';
+  row.appendChild(avatar);
+  const body = document.createElement('div');
+  body.style.flex = '1';
+  body.appendChild(meta);
+  body.appendChild(text);
+  body.appendChild(actions);
+  // replies
+  if (c.replies && c.replies.length) {
+    const replies = document.createElement('div');
+    replies.className = 'comment-replies';
+    c.replies.forEach(r => replies.appendChild(renderComment(r)));
+    body.appendChild(replies);
+  }
+  row.appendChild(body);
+  container.appendChild(row);
+  return container;
+}
+
+function showReplyBox(parentId) {
+  const text = prompt('Enter reply:');
+  if (!text) return;
+  const id = window.comments.instructionId;
+  fetch(`/api/Comments/${parentId}/reply`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('jwtToken') || '') },
+    body: JSON.stringify({ text: text, draftingInstructionID: id })
+  }).then(refreshComments);
+}
+
+function resolveComment(id) {
+  if (!confirm('Mark this comment as resolved?')) return;
+  fetch(`/api/Comments/${id}/resolve`, {
+    method: 'PUT',
+    headers: { Authorization: 'Bearer ' + (localStorage.getItem('jwtToken') || '') }
+  }).then(refreshComments);
+}
+
+function submitComment() {
+  const text = document.getElementById('newCommentText').value.trim();
+  if (!text) return;
+  const id = window.comments.instructionId;
+  fetch('/api/Comments', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('jwtToken') || '') },
+    body: JSON.stringify({ draftingInstructionID: id, text: text })
+  }).then(() => {
+    document.getElementById('newCommentText').value = '';
+    refreshComments();
+  });
+}
+</script>
