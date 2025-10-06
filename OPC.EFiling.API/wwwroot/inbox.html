@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inbox – OPC e‑Filing</title>
+  <!-- Bootstrap and shared styles -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="static/style.css" rel="stylesheet">
+</head>
+<body onload="initInbox()">
+  <!-- Flag accent bar -->
+  <div class="flag-bar">
+    <div class="bar flag-blue"></div>
+    <div class="bar flag-white"></div>
+    <div class="bar flag-green"></div>
+  </div>
+  <!-- Glassy navigation bar -->
+  <nav class="navbar navbar-expand-lg glassy sticky-top">
+    <div class="container">
+      <a class="navbar-brand brand-mark" href="dashboard.html">
+        <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" alt="Lesotho Coat of Arms">
+        <img src="static/eu_logo.png" alt="EU flag">
+        <span>OPC <span class="text-primary">E‑Filing</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link position-relative" href="tasks.html">Tasks <span id="tasksBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span></a></li>
+          <li class="nav-item"><a class="nav-link position-relative" href="inbox.html">Inbox <span id="inboxBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="templates.html">Templates</a></li>
+          <li class="nav-item" id="navManageUsers"><a class="nav-link" href="manage-users.html">Manage Users</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+          <li class="nav-item"><a class="btn btn-sm btn-outline-dark" href="#" onclick="OPC.logout(); return false;">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container py-4">
+    <h2>Inbox</h2>
+    <div id="messageList" class="list-group mt-3"></div>
+  </div>
+  <script src="static/main.js"></script>
+  <script>
+    function initInbox() {
+      const user = OPC.getCurrentUser();
+      if (!user) { window.location.href = 'index.html'; return; }
+      // Show or hide the Manage Users menu based on role
+      const manageItem = document.getElementById('navManageUsers');
+      if (user.role !== 'admin') {
+        if (manageItem) manageItem.style.display = 'none';
+      } else {
+        if (manageItem) manageItem.style.display = '';
+      }
+      OPC.updateBadges();
+      renderMessages();
+    }
+    function renderMessages() {
+      const data = OPC.loadData();
+      const user = OPC.getCurrentUser();
+      const messages = data.messages.filter(m => m.recipientId === user.id);
+      const list = document.getElementById('messageList');
+      list.innerHTML = '';
+      if (!messages.length) {
+        list.innerHTML = '<div class="list-group-item">No messages.</div>';
+        return;
+      }
+      messages.sort((a,b) => b.timestamp - a.timestamp);
+      messages.forEach(msg => {
+        const item = document.createElement('a');
+        item.href = '#';
+        item.className = 'list-group-item list-group-item-action flex-column align-items-start' + (msg.read ? '' : ' list-group-item-info');
+        item.innerHTML = `<div class="d-flex w-100 justify-content-between"><h5 class="mb-1">${msg.subject}</h5><small>${new Date(msg.timestamp).toLocaleString()}</small></div><p class="mb-1">${msg.content}</p>`;
+        item.onclick = () => {
+          OPC.markMessageRead(msg.id);
+          renderMessages();
+          return false;
+        };
+        list.appendChild(item);
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
