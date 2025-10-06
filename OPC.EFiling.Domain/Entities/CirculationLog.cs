@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace OPC.EFiling.Domain.Entities
 {
@@ -6,28 +7,25 @@ namespace OPC.EFiling.Domain.Entities
     {
         public int CirculationLogId { get; set; }
 
-        // Link to the draft (latest or specific version you sent)
         public int DraftId { get; set; }
-        public Draft? Draft { get; set; }
+        public Draft Draft { get; set; } = null!;
 
-        // Optional: capture a version label/number if you want to tag it
-        public string? VersionLabel { get; set; }   // e.g. "v1.0" or "v1.1"
-
-        // Email details
-        public string SentToEmail { get; set; } = string.Empty;
+        public string? VersionLabel { get; set; }
+        public string SentToEmail { get; set; } = null!;
         public string? CcEmail { get; set; }
-        public string Subject { get; set; } = string.Empty;
-
-        // When and by whom (OPC user) this send occurred
-        public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public string Subject { get; set; } = null!;
+        public DateTime SentAt { get; set; }
         public int? SentByUserId { get; set; }
         public User? SentByUser { get; set; }
-
-        // Optional notes: “First send to MDA”, “Addressed comments”, etc.
         public string? Notes { get; set; }
 
-        // Optional: store the DocumentId if you persist the exported PDF
         public int? DocumentId { get; set; }
         public Document? Document { get; set; }
+
+        /// <summary>
+        /// Collection of responses received for this circulation log.
+        /// Each response represents feedback from the recipient ministry.
+        /// </summary>
+        public ICollection<CirculationResponse> Responses { get; set; } = new List<CirculationResponse>();
     }
 }
