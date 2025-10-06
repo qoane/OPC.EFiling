@@ -64,10 +64,77 @@ namespace OPC.EFiling.API.Controllers
             return Ok(signature);
         }
 
-        public class SignatureDto
+        /// <summary>
+        /// Final sign-off endpoint — stores a base64 signature image and signer metadata.
+        /// </summary>
+        /// <param name="request">Signature payload</param>
+        [HttpPost("SignOff")]
+        public async Task<IActionResult> SignOff([FromBody] SignatureRequest request)
+        {
+            if (request == null || request.DraftingInstructionId <= 0 || string.IsNullOrWhiteSpace(request.SignatureImage))
+                return BadRequest("Invalid signature data.");
+
+            try
+            {
+                var instruction = await _context.DraftingInstructions
+                    .FirstOrDefaultAsync(i => i.DraftingInstructionID == request.DraftingInstructionId);
+
+                if (instruction == null)
+                    return NotFound("Drafting instruction not found.");
+
+                // Save signature entity
+                var signature = new Signature
+                {
+                    DraftingInstructionId = request.DraftingInstructionId,
+                    SignerName = request.SignerName?.Trim() ?? "Unknown Signer",
+                    ImageData =request.SignatureImage,
+                    SignedAt = DateTime.UtcNow
+                };
+
+                _context.Signatures.Add(signature);
+
+                // Update instruction status to "SignedOff"
+                instruction.Status = "SignedOff";
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Signature successfully captured and document signed off.",
+                    signer = signature.SignerName,
+                    date = signature.SignedAt
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to process signature.", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Retrieve all signatures for a given instruction (optional for timeline/audit view).
+        /// </summary>
+        [HttpGet("ByInstruction/{instructionId}")]
+        public async Task<IActionResult> GetSignatures(int instructionId)
+        {
+            var signatures = await _context.Signatures
+                .Where(s => s.DraftingInstructionId == instructionId)
+                .ToListAsync();
+
+            return Ok(signatures);
+        }
+    }
+
+    public class SignatureDto
         {
             public string ImageData { get; set; } = string.Empty;
             public string? SignerName { get; set; }
         }
+
+    public class SignatureRequest
+    {
+        public int DraftingInstructionId { get; set; }
+        public string SignerName { get; set; } = string.Empty;
+        public string SignatureImage { get; set; } = string.Empty; // base64 image
     }
 }

@@ -19,9 +19,10 @@ namespace OPC.EFiling.Infrastructure.Data.Configurations
 
             // Relationship: one circulation log has many responses
             b.HasOne(x => x.CirculationLog)
-                .WithMany()
-                .HasForeignKey(x => x.CirculationLogId)
-                .OnDelete(DeleteBehavior.Cascade);
+     .WithMany(c => c.Responses)
+     .HasForeignKey(x => x.CirculationLogId)
+     .OnDelete(DeleteBehavior.Cascade);
+
 
             // Relationship: optional link to the uploaded document returned by the ministry
             b.HasOne(x => x.Document)

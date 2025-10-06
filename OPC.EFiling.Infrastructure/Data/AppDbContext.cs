@@ -9,15 +9,14 @@ namespace OPC.EFiling.Infrastructure.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
+        // Core domain sets
         public DbSet<Department> Departments { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
 
-        // Existing sets
         public DbSet<DraftingInstruction> DraftingInstructions { get; set; }
         public DbSet<InstructionAttachment> InstructionAttachments { get; set; }
         public DbSet<Draft> Drafts { get; set; }
-
         public DbSet<Document> Documents { get; set; }
         public DbSet<UploadedFile> Files { get; set; }
         public DbSet<ApprovalLog> ApprovalLogs { get; set; }
@@ -27,79 +26,67 @@ namespace OPC.EFiling.Infrastructure.Data
         public DbSet<InstructionLock> InstructionLocks { get; set; }
         public DbSet<DraftVersion> DraftVersions { get; set; }
 
-        // Circulation-related sets
-        /// <summary>
-        /// Table storing each time a draft is circulated to a ministry.
-        /// </summary>
+        // Circulation
         public DbSet<CirculationLog> CirculationLogs { get; set; }
-
-        /// <summary>
-        /// Table storing responses from ministries for each circulation log entry.
-        /// </summary>
         public DbSet<CirculationResponse> CirculationResponses { get; set; }
 
-        // Template sets
-        /// <summary>
-        /// Stores drafting templates uploaded by administrators or parliamentary counsel. Templates provide starting
-        /// documents for new instructions.
-        /// </summary>
-        public DbSet<Template> Templates { get; set; }
-
-        /// <summary>
-        /// Stores threaded comments on drafting instructions. Comments persist across draft versions
-        /// and support replies for conversation-like review threads.
-        /// </summary>
+        // Collaboration
         public DbSet<Comment> Comments { get; set; }
-
-        /// <summary>
-        /// Stores captured signatures for final approval. Each signature is
-        /// attached to a drafting instruction and includes the signer's name
-        /// and a base64 encoded image.
-        /// </summary>
         public DbSet<Signature> Signatures { get; set; }
+        public DbSet<Template> Templates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-        base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder);
 
-            // ── One-to-many: DraftingInstruction → InstructionAttachment
+            // DraftingInstruction → Attachments
             modelBuilder.Entity<InstructionAttachment>()
                 .HasOne(a => a.DraftingInstruction)
                 .WithMany(i => i.Files)
                 .HasForeignKey(a => a.DraftingInstructionID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ── One-to-many: DraftingInstruction → Draft
+            // DraftingInstruction → Drafts
             modelBuilder.Entity<Draft>()
                 .HasOne(d => d.DraftingInstruction)
                 .WithMany(i => i.Drafts)
                 .HasForeignKey(d => d.DraftingInstructionID)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // DraftVersion → DraftingInstruction
             modelBuilder.Entity<DraftVersion>()
                 .HasOne<DraftingInstruction>()
                 .WithMany()
                 .HasForeignKey(dv => dv.DraftingInstructionID)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // InstructionLock → DraftingInstruction
             modelBuilder.Entity<InstructionLock>()
                 .HasOne<DraftingInstruction>()
                 .WithMany()
                 .HasForeignKey(l => l.DraftingInstructionID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Apply explicit configurations for circulation entities and templates.
+            // ✅ CirculationLog → CirculationResponse (1:N)
+            modelBuilder.Entity<CirculationResponse>()
+                .HasOne(r => r.CirculationLog)
+                .WithMany(l => l.Responses)
+                .HasForeignKey(r => r.CirculationLogId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Signature → DraftingInstruction
+            modelBuilder.Entity<Signature>()
+                .HasOne<DraftingInstruction>()
+                .WithMany()
+                .HasForeignKey(s => s.DraftingInstructionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Apply configs
             modelBuilder.ApplyConfiguration(new CirculationLogConfiguration());
             modelBuilder.ApplyConfiguration(new CirculationResponseConfiguration());
             modelBuilder.ApplyConfiguration(new TemplateConfiguration());
-
-            // Apply configuration for signatures
             modelBuilder.ApplyConfiguration(new SignatureConfiguration());
-
-            // Comments configuration
             modelBuilder.ApplyConfiguration(new CommentConfiguration());
-
-            // Additional model configuration can remain here.
         }
     }
 }

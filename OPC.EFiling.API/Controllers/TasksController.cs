@@ -14,7 +14,8 @@ namespace OPC.EFiling.API.Controllers
     /// Provides task lists for users based on their role and the state of drafts and circulations.
     /// Tasks represent work items such as drafting an instruction, logging a draft, reviewing a
     /// circulated document or responding to a ministry.  This controller aggregates data from
-    /// existing domain entities rather than maintaining a separate task table.
+    /// existing domain entities rather than maintaining a separate task table.  Additional task
+    /// types can be added as the workflow expands (e.g. admin approvals, user onboarding).
     /// </summary>
     [Authorize]
     [ApiController]
@@ -27,6 +28,14 @@ namespace OPC.EFiling.API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Returns a list of pending tasks for the currently authenticated user.  The tasks
+        /// are computed on the fly based on the user's roles and the current state of
+        /// drafts, circulations and comments.  Each task object includes the
+        /// drafting instruction identifier (if available), a title, a description, a
+        /// task type, a status and the date it was created.  Clients can display this
+        /// information in a task dashboard.
+        /// </summary>
         [HttpGet("user")]
         public async Task<IActionResult> GetUserTasks()
         {
@@ -36,14 +45,15 @@ namespace OPC.EFiling.API.Controllers
 
             var tasks = new List<object>();
 
-            // ---------------- Drafter Tasks ----------------
+            // Drafter tasks: all drafts created by this user.  A draft is considered a task
+            // until at least one circulation log exists.  We don't rely on a separate
+            // status field so this heuristic keeps the drafter's task list populated.
             if (roles.Contains("Drafter"))
             {
                 var myDrafts = await _context.Drafts
                     .Where(d => d.CreatedByUserID == userId)
                     .Include(d => d.CirculationLogs)
                     .ToListAsync();
-
                 foreach (var d in myDrafts)
                 {
                     var status = d.CirculationLogs.Any() ? "Sent" : "Pending";
@@ -59,13 +69,13 @@ namespace OPC.EFiling.API.Controllers
                 }
             }
 
-            // ---------------- Registry Officer Tasks ----------------
+            // Registry officer tasks: drafts that have not been circulated (no circulation logs)
+            // and therefore need to be logged and sent out.  Each such draft becomes a task.
             if (roles.Contains("RegistryOfficer"))
             {
                 var unlogged = await _context.Drafts
                     .Where(d => !d.CirculationLogs.Any())
                     .ToListAsync();
-
                 foreach (var d in unlogged)
                 {
                     tasks.Add(new
@@ -80,14 +90,15 @@ namespace OPC.EFiling.API.Controllers
                 }
             }
 
-            // ---------------- PC Tasks ----------------
+            // PC tasks: drafts that have at least one circulation log.  PCs review
+            // circulated drafts and manage allocations to drafters.  Each such draft is
+            // presented as a review task.
             if (roles.Contains("PC"))
             {
                 var loggedDrafts = await _context.Drafts
                     .Where(d => d.CirculationLogs.Any())
                     .Include(d => d.CirculationLogs)
                     .ToListAsync();
-
                 foreach (var d in loggedDrafts)
                 {
                     tasks.Add(new
@@ -102,13 +113,14 @@ namespace OPC.EFiling.API.Controllers
                 }
             }
 
-            // ---------------- Senior PC Tasks ----------------
+            // Senior PC tasks: drafts that have been circulated and require final approval.
+            // We approximate by showing all drafts with circulation logs.  Additional
+            // filtering could be implemented (e.g. only drafts without signatures).
             if (roles.Contains("SeniorPC"))
             {
                 var approvalDrafts = await _context.Drafts
                     .Where(d => d.CirculationLogs.Any())
                     .ToListAsync();
-
                 foreach (var d in approvalDrafts)
                 {
                     tasks.Add(new
@@ -123,15 +135,16 @@ namespace OPC.EFiling.API.Controllers
                 }
             }
 
-            // ---------------- MDA Tasks ----------------
+            // MDA tasks: circulations with no responses yet.  Ministries need to
+            // review the circulated draft and send back their response.  Each
+            // unresponded circulation is shown as a task.
             if (roles.Contains("MDA"))
             {
-                // Circulation logs with no recorded responses
                 var pendingResponses = await _context.CirculationLogs
                     .Include(cl => cl.Draft)
-                    .Where(cl => !_context.CirculationResponses.Any(r => r.CirculationLogId == cl.CirculationLogId))
+                    .Include(cl => cl.Responses)
+                    .Where(cl => !cl.Responses.Any())
                     .ToListAsync();
-
                 foreach (var c in pendingResponses)
                 {
                     tasks.Add(new
@@ -146,13 +159,14 @@ namespace OPC.EFiling.API.Controllers
                 }
             }
 
-            // ---------------- Admin Tasks ----------------
+            // Admin tasks: unresolved comments across all instructions.  Admins can
+            // monitor outstanding discussions and assign follow‑ups.  Each unresolved
+            // comment becomes a task.
             if (roles.Contains("Admin"))
             {
                 var unresolved = await _context.Comments
                     .Where(c => !c.IsResolved)
                     .ToListAsync();
-
                 foreach (var c in unresolved)
                 {
                     tasks.Add(new
@@ -167,11 +181,10 @@ namespace OPC.EFiling.API.Controllers
                 }
             }
 
-            // ---------------- Sort by Date ----------------
+            // Sort tasks by creation date (descending) for display
             var ordered = tasks
                 .OrderByDescending(t => (DateTime)t.GetType().GetProperty("CreatedAt")!.GetValue(t)!)
                 .ToList();
-
             return Ok(ordered);
         }
     }
