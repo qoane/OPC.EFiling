@@ -3,454 +3,607 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Drafter Dashboard | OPC E‑Filing</title>
+    <title>OPC E‑Filing System — Modern Glass Redesign</title>
 
-    <!-- Fonts & Icons -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- CKEditor 5 Document build for Word‑like editing -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/decoupled-document/ckeditor.js"></script>
-    <!-- Free libraries for export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.4.1/html-docx.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- AOS (Animate On Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
     <style>
         :root {
-            --les-blue: #0c4ad4;
-            --les-green: #1f8a43;
-            --ink-900: #0b1020;
-            --ink-700: #1f2a44;
-            --ink-500: #4b587a;
+            /* Nude / muted neutrals */
             --nude-10: #fdfcfb;
             --nude-25: #fbf8f5;
             --nude-50: #f7f3ef;
+            --nude-100: #efe9e3;
+            --nude-200: #e4dbd3;
+            --nude-300: #d7ccc5;
+            /* Lesotho flag accents */
+            --les-blue: #0c4ad4; /* rich blue */
+            --les-green: #1f8a43; /* deep green */
+            --les-black: #1e1e1e;
+            /* Inks */
+            --ink-900: #0b1020;
+            --ink-700: #1f2a44;
+            --ink-500: #4b587a;
+            --ink-300: #8a95ad;
+            /* Glass */
+            --glass-bg: 24, 36, 66; /* base RGB for glass tint */
+            --glass-alpha: .6;
+            --glass-bright: rgba(255,255,255,.65);
+            --shadow-md: 0 10px 30px rgba(11,16,32,.15);
+            --radius-2xl: 22px;
         }
+
+        html, body {
+            height: 100%
+        }
+
         body {
-            font-family: Inter, sans-serif;
-            background: radial-gradient(1200px 800px at 10% -10%, var(--nude-10), var(--nude-25)), radial-gradient(1000px 700px at 110% 10%, var(--nude-50), var(--nude-10));
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
             color: var(--ink-700);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            background: radial-gradient(1200px 800px at 10% -10%, var(--nude-10), var(--nude-25)), radial-gradient(1000px 700px at 110% 10%, var(--nude-50), var(--nude-10));
             overflow-x: hidden;
         }
-        .navbar {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-        .navbar-nav .nav-link.active {
-            font-weight: 600;
-            color: var(--les-blue) !important;
-        }
-        .main-wrap {
-            flex: 1;
-            padding: 1rem;
-        }
-        .instructions-panel {
-            max-height: calc(100vh - 200px);
-            overflow-y: auto;
-        }
-        .doc-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 200px);
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.06);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        .doc-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8f9fa;
-            padding: 0.5rem 0.75rem;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .doc-editor {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-        /* Comments toggle button */
-        #toggleCommentsBtn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1050;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--les-blue);
-            color: #fff;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
-        /* Comments sidebar placeholder in layout (invisible until component loaded) */
-        #commentsSidebar {
-            position: fixed;
-            top: 70px;
-            right: 0;
-            bottom: 0;
-            width: 360px;
-            display: none;
+
+        /* Flag accent bar */
+        .flag-bar {
+            position: sticky;
+            top: 0;
             z-index: 1040;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06)
+        }
+
+            .flag-bar .bar {
+                height: 6px
+            }
+
+        .flag-blue {
+            background: var(--les-blue)
+        }
+
+        .flag-white {
+            background: #fff
+        }
+
+        .flag-green {
+            background: var(--les-green)
+        }
+
+        /* Background orbs */
+        .orb {
+            position: absolute;
+            filter: blur(40px);
+            opacity: .28;
+            z-index: 0
+        }
+
+            .orb.blue {
+                background: radial-gradient( circle at 40% 40%, #2e6cff, rgba(46,108,255,0) 60% );
+            }
+
+            .orb.green {
+                background: radial-gradient( circle at 60% 60%, #3ecf6d, rgba(62,207,109,0) 60% );
+            }
+
+            .orb.nude {
+                background: radial-gradient( circle at 50% 50%, #ffe8d8, rgba(255,232,216,0) 60% );
+            }
+
+            .orb.size-lg {
+                width: 520px;
+                height: 520px;
+                border-radius: 50%
+            }
+
+            .orb.size-md {
+                width: 360px;
+                height: 360px;
+                border-radius: 50%
+            }
+
+            .orb.size-sm {
+                width: 220px;
+                height: 220px;
+                border-radius: 50%
+            }
+
+        @keyframes floaty {
+            0% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-18px)
+            }
+
+            100% {
+                transform: translateY(0)
+            }
+        }
+
+        .animate-float {
+            animation: floaty 10s ease-in-out infinite
+        }
+
+        /* Glass helpers */
+        .glass {
+            background: rgba(var(--glass-bg), var(--glass-alpha));
+            backdrop-filter: blur(14px) saturate(130%);
+            -webkit-backdrop-filter: blur(14px) saturate(130%);
+            border: 1px solid rgba(255,255,255,.25);
+            box-shadow: var(--shadow-md);
+            border-radius: var(--radius-2xl);
+        }
+
+        /* Navbar */
+        .navbar {
+            --bs-navbar-padding-y: .6rem
+        }
+
+            .navbar.glassy {
+                background: rgba(255,255,255,.65) !important;
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid rgba(0,0,0,.06);
+            }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-weight: 800;
+            color: var(--ink-900)
+        }
+
+            .brand-mark img {
+                width: 32px;
+                height: 32px
+            }
+
+        .nav-link {
+            font-weight: 500
+        }
+
+        /* Hero */
+        header.hero {
+            position: relative;
+            padding: 120px 0 80px;
+        }
+
+        .hero .halo {
+            position: absolute;
+            inset: -120px -80px -80px -80px;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(1100px 600px at 50% -10%, rgba(12,74,212,.2), rgba(12,74,212,0) 60%), radial-gradient(900px 560px at 80% 10%, rgba(31,138,67,.18), rgba(31,138,67,0) 60%);
+        }
+
+        .hero h1 {
+            color: var(--ink-900);
+            letter-spacing: -.02em
+        }
+
+        .kicker {
+            color: var(--ink-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .22em
+        }
+
+        .cta-btn {
+            padding: .9rem 1.2rem;
+            border-radius: 14px;
+            font-weight: 700
+        }
+
+        .btn-flag {
+            background: linear-gradient(90deg, var(--les-blue), #1a66ff 48%, #fff 49%, #fff 51%, var(--les-green) 52%, #31a95a 100%);
+            color: #0b1020;
+            border: none
+        }
+
+            .btn-flag:hover {
+                filter: brightness(.96)
+            }
+
+        .btn-ghost {
+            border: 1px solid rgba(11,16,32,.12)
+        }
+
+        /* Feature cards */
+        .feature-card {
+            padding: 26px
+        }
+
+        .feature-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 26px;
+            font-weight: 700;
+            background: linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,.05));
+            border: 1px solid rgba(255,255,255,.4);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative
+        }
+
+            .timeline::before {
+                content: "";
+                position: absolute;
+                left: 24px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: linear-gradient(var(--les-blue), var(--les-green))
+            }
+
+        .timeline-step {
+            position: relative;
+            padding-left: 72px
+        }
+
+            .timeline-step .dot {
+                position: absolute;
+                left: 15px;
+                top: 6px;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #fff;
+                border: 4px solid var(--les-blue)
+            }
+
+        /* Badges / chips */
+        .chip {
+            background: rgba(255,255,255,.8);
+            border: 1px solid rgba(0,0,0,.05);
+            padding: .35rem .7rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: .85rem
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.9))
+        }
+
+        /* Waves */
+        .wave {
+            display: block;
+            width: 100%;
+            height: auto
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 991px) {
+            header.hero {
+                padding: 96px 0 64px
+            }
+
+            .timeline::before {
+                left: 20px
+            }
+
+            .timeline-step {
+                padding-left: 64px
+            }
+
+                .timeline-step .dot {
+                    left: 8px
+                }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <!-- Flag accent bar -->
+    <div class="flag-bar">
+        <div class="bar flag-blue"></div>
+        <div class="bar flag-white"></div>
+        <div class="bar flag-green"></div>
+    </div>
+
+    <!-- Background Orbs -->
+    <div class="orb blue size-lg animate-float" style="top:-120px; left:-120px"></div>
+    <div class="orb green size-md animate-float" style="bottom:10%; right:-80px; animation-delay:.6s"></div>
+    <div class="orb nude size-sm animate-float" style="top:40%; left:10%"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg glassy sticky-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" alt="Lesotho Coat of Arms" width="32" height="32">
-                <span class="fw-bold">OPC <span class="text-primary">E‑Filing</span></span>
+            <a class="navbar-brand brand-mark" href="#">
+                <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" alt="Lesotho Coat of Arms">
+                <span>OPC <span class="text-primary">E‑Filing</span></span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="nav">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-                    <li class="nav-item" data-roles="All"><a class="nav-link" href="dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
-                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="instructions.html"><i class="bi bi-card-list me-1"></i>Instructions</a></li>
-                    <li class="nav-item" data-roles="All"><a class="nav-link" href="tasks.html"><i class="bi bi-list-check me-1"></i>My Tasks</a></li>
-                    <li class="nav-item" data-roles="MDA"><a class="nav-link" href="submit-instruction.html"><i class="bi bi-plus-circle me-1"></i>New Instruction</a></li>
-                    <li class="nav-item" data-roles="PC"><a class="nav-link" href="pc-allocation.html"><i class="bi bi-person-plus me-1"></i>PC Allocation</a></li>
-                    <li class="nav-item" data-roles="RegistryOfficer"><a class="nav-link" href="registry-logging.html"><i class="bi bi-archive me-1"></i>Registry Logging</a></li>
-                    <li class="nav-item" data-roles="Drafter"><a class="nav-link active" aria-current="page" href="drafter-dashboard.html"><i class="bi bi-journal-text me-1"></i>Drafter Dashboard</a></li>
-                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="search.html"><i class="bi bi-search me-1"></i>Search</a></li>
-                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="templates.html"><i class="bi bi-layout-text-window me-1"></i>Templates</a></li>
-                    <li class="nav-item" data-roles="PC,RegistryOfficer,Drafter,Admin"><a class="nav-link" href="circulation.html"><i class="bi bi-send me-1"></i>Circulation</a></li>
-                    <li class="nav-item" data-roles="Admin"><a class="nav-link" href="manage-users.html"><i class="bi bi-people me-1"></i>User Management</a></li>
-                    <!-- Notification, message and task icons with badges -->
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="#" title="Notifications">
-                            <i class="bi bi-bell"></i>
-                            <span id="navNotifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="#" title="Messages">
-                            <i class="bi bi-envelope"></i>
-                            <span id="navMsgBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">0</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="tasks.html" title="My Tasks">
-                            <i class="bi bi-clipboard-check"></i>
-                            <span id="navTaskBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">0</span>
-                        </a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="profile.html"><i class="bi bi-person-circle me-1"></i>Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#process">Process</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#integrations">Integrations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#security">Security</a></li>
+                    <li class="nav-item ms-lg-2"><a class="btn btn-sm btn-outline-dark" href="login.html"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <main class="container-fluid main-wrap mt-4">
-        <h2 class="fw-bold mb-3">Drafter Dashboard</h2>
-        <div class="row">
-            <!-- Left column: assigned instructions -->
-            <div class="col-lg-3 mb-3">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-inbox me-2"></i>Assigned Instructions</span>
-                        <button id="btnRefresh" class="btn btn-sm btn-light"><i class="bi bi-arrow-clockwise"></i></button>
+    <!-- HERO -->
+    <header class="hero position-relative">
+        <div class="halo"></div>
+        <div class="container position-relative" style="z-index:1">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7" data-aos="fade-right">
+                    <div class="chip mb-3"><i class="bi bi-stars me-2"></i>Modern, secure & collaborative</div>
+                    <h1 class="display-4 fw-extrabold mb-3">A glass‑smooth path from <span class="text-primary">draft</span> to <span style="color:var(--les-green)">enactment</span>.</h1>
+                    <p class="lead mb-4">The Office of Parliamentary Counsel’s end‑to‑end platform for drafting, collaboration, review, and publication of legislation in Lesotho.</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="login.html" class="btn btn-flag cta-btn"><i class="bi bi-lightning-charge-fill me-2"></i>Enter the Portal</a>
+                        <a href="#features" class="btn btn-light btn-ghost cta-btn"><i class="bi bi-play-circle me-2"></i>See how it works</a>
                     </div>
-                    <div class="card-body instructions-panel p-0">
-                        <div id="assignedList" class="list-group list-group-flush"></div>
+                    <div class="d-flex gap-4 mt-4 small text-muted">
+                        <div><i class="bi bi-shield-lock me-1"></i>Encryption at rest & transit</div>
+                        <div><i class="bi bi-check2-circle me-1"></i>Audit trails & versioning</div>
+                        <div><i class="bi bi-people me-1"></i>Real‑time co‑editing</div>
                     </div>
                 </div>
-            </div>
-            <!-- Right column: editor and toolbar -->
-            <div class="col-lg-9">
-                <div class="doc-container mb-3">
-                    <div class="doc-toolbar">
-                        <div>
-                            <strong id="docTitle">No instruction selected</strong>
-                            <small id="docStatus" class="text-muted ms-2"></small>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <!-- File menu dropdown -->
-                            <div class="dropdown">
-                                <button class="btn btn-light dropdown-toggle" type="button" id="fileMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-file-earmark-text me-1"></i> File
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="fileMenuBtn">
-                                    <li><a class="dropdown-item" href="#" id="btnSave">Save Draft</a></li>
-                                    <li><a class="dropdown-item" href="#" id="btnSubmit">Submit Draft</a></li>
-                                    <li><a class="dropdown-item" href="#" id="btnExportWord">Export as Word</a></li>
-                                    <li><a class="dropdown-item" href="#" id="btnExportPdf">Export as PDF</a></li>
-                                </ul>
+                <div class="col-lg-5" data-aos="fade-up" data-aos-delay="100">
+                    <div class="glass p-3">
+                        <div class="rounded-4 overflow-hidden">
+                            <!-- Public‑safe illustrative card (animated workflow preview) -->
+                            <div class="p-4" style="background:linear-gradient(135deg, rgba(12,74,212,.10), rgba(31,138,67,.10));">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <span class="feature-icon"><i class="bi bi-file-earmark-text"></i></span>
+                                    <div>
+                                        <div class="fw-bold">Workflow Snapshot</div>
+                                        <small class="text-muted">Public preview</small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2 d-flex align-items-center gap-2 small">
+                                    <span id="wf-step-icon" class="feature-icon" style="width:40px;height:40px;font-size:18px"><i class="bi bi-inbox"></i></span>
+                                    <div class="flex-grow-1">
+                                        <div id="wf-step" class="fw-semibold">Intake received</div>
+                                        <div class="progress mt-2" role="progressbar" aria-label="Progress" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style="height:10px">
+                                            <div id="wf-progress" class="progress-bar" style="width:15%; background:linear-gradient(90deg, var(--les-blue), var(--les-green))"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Typical journey from request to publication</small>
                             </div>
-                            <button class="btn btn-outline-primary" id="btnCommentsToggle"><i class="bi bi-chat-square-dots me-1"></i>Comments</button>
                         </div>
                     </div>
-                    <!-- CKEditor toolbar placeholder -->
-                    <div id="editorToolbar"></div>
-                    <!-- Editor area -->
-                    <div id="editor" class="doc-editor"></div>
                 </div>
-                <div id="saveStatus" class="small text-muted"></div>
-                <div id="draftMessage" class="mt-2 small fw-semibold text-danger"></div>
             </div>
         </div>
-    </main>
+    </header>
 
-    <!-- Comments sidebar (loaded dynamically from components/comments-sidebar.html) -->
-    <div id="commentsSidebar"></div>
-    <button id="toggleCommentsBtn" title="Comments" style="display:none;"><i class="bi bi-chat-text"></i></button>
+    <!-- Decorative Wave -->
+    <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+        <path fill="#ffffff" d="M0,64L48,74.7C96,85,192,107,288,106.7C384,107,480,85,576,80C672,75,768,85,864,96C960,107,1056,117,1152,112C1248,107,1344,85,1392,74.7L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z" />
+    </svg>
 
-    <!-- Footer -->
-    <footer class="py-4">
-        <div class="container text-center small text-muted">
-            © 2025 Government of Lesotho · Office of Parliamentary Counsel
+    <!-- FEATURES -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="row align-items-center g-4 mb-4">
+                <div class="col-lg-8" data-aos="fade-up">
+                    <h2 class="fw-bolder mb-2">Everything you need for legislative drafting</h2>
+                    <p class="mb-0">Glassy, fast, and secure—built for the workflows of Lesotho’s Office of Parliamentary Counsel.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end" data-aos="zoom-in">
+                    <span class="chip"><i class="bi bi-shield-lock-fill me-1"></i> Enterprise‑grade controls</span>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="0">
+                    <div class="glass feature-card h-100">
+                        <div class="feature-icon mb-3"><i class="bi bi-shield-lock"></i></div>
+                        <h5 class="fw-bold mb-2">Secure & Encrypted</h5>
+                        <p class="mb-0">All documents protected in transit & at rest with granular role‑based access and audit logs.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="50">
+                    <div class="glass feature-card h-100">
+                        <div class="feature-icon mb-3"><i class="bi bi-people"></i></div>
+                        <h5 class="fw-bold mb-2">Real‑time Collaboration</h5>
+                        <p class="mb-0">Co‑edit drafts, add comments, track changes, and resolve discussions instantly.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="glass feature-card h-100">
+                        <div class="feature-icon mb-3"><i class="bi bi-diagram-3"></i></div>
+                        <h5 class="fw-bold mb-2">Workflow Automation</h5>
+                        <p class="mb-0">From intake to publication with assignments, locking, SLAs, and status tracking.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="150">
+                    <div class="glass feature-card h-100">
+                        <div class="feature-icon mb-3"><i class="bi bi-link-45deg"></i></div>
+                        <h5 class="fw-bold mb-2">Easy Integrations</h5>
+                        <p class="mb-0">Connect to Ministry systems, AG’s office, Printing Office, and archives via secure APIs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROCESS / TIMELINE (vague tool references) -->
+    <section id="process" class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-5" data-aos="fade-right">
+                    <h2 class="fw-bolder mb-2">From instruction to Gazette</h2>
+                    <p class="mb-3">A streamlined, auditable path designed for clarity and speed. Each step is permissioned and timestamped.</p>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-1"><i class="bi bi-check2 me-1"></i> Role‑based dashboards</li>
+                        <li class="mb-1"><i class="bi bi-check2 me-1"></i> Document locking & heartbeats</li>
+                        <li class="mb-1"><i class="bi bi-check2 me-1"></i> Version diffs & comment history</li>
+                    </ul>
+                </div>
+                <div class="col-lg-7" data-aos="fade-up">
+                    <div class="timeline glass p-4">
+                        <div class="timeline-step mb-4">
+                            <div class="dot"></div>
+                            <h6 class="fw-bold mb-1">1) Intake & Triage</h6>
+                            <p class="mb-0 small">Requests are submitted, validated, prioritised, and routed to the appropriate team.</p>
+                        </div>
+                        <div class="timeline-step mb-4">
+                            <div class="dot" style="border-color: var(--les-green)"></div>
+                            <h6 class="fw-bold mb-1">2) Drafting & Collaboration</h6>
+                            <p class="mb-0 small">Work together in a secure editor with live updates, comments, suggestions, and autosave.</p>
+                        </div>
+                        <div class="timeline-step mb-4">
+                            <div class="dot" style="border-color:#0b6efd"></div>
+                            <h6 class="fw-bold mb-1">3) Review & Approval</h6>
+                            <p class="mb-0 small">Supervisory review, redlines, approvals, and export to publication‑ready formats.</p>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="dot" style="border-color:#111"></div>
+                            <h6 class="fw-bold mb-1">4) Publication & Archive</h6>
+                            <p class="mb-0 small">Forward to Government Printing, archive with immutable hashes, and surface to public portals.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTEGRATIONS / TRUST -->
+    <section id="integrations" class="py-5">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7" data-aos="fade-up">
+                    <div class="glass p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2"><i class="bi bi-patch-check-fill text-primary"></i><span class="fw-bold">Trusted & interoperable</span></div>
+                        <div class="row g-3 small">
+                            <div class="col-6 col-md-4"><div class="p-3 border rounded-3 bg-white h-100 text-center">Ministry Systems</div></div>
+                            <div class="col-6 col-md-4"><div class="p-3 border rounded-3 bg-white h-100 text-center">AG’s Office</div></div>
+                            <div class="col-6 col-md-4"><div class="p-3 border rounded-3 bg-white h-100 text-center">Printing Office</div></div>
+                            <div class="col-6 col-md-4"><div class="p-3 border rounded-3 bg-white h-100 text-center">Gov SSO / LDAP</div></div>
+                            <div class="col-6 col-md-4"><div class="p-3 border rounded-3 bg-white h-100 text-center">Email / SMS</div></div>
+                            <div class="col-6 col-md-4"><div class="p-3 border rounded-3 bg-white h-100 text-center">Public Portal</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5" data-aos="fade-left">
+                    <div class="glass p-4 h-100">
+                        <h5 class="fw-bold">Security & Compliance</h5>
+                        <p class="small mb-3">Hardened hosting, principle of least privilege, environment isolation, and detailed audit trails.</p>
+                        <ul class="small text-muted mb-0">
+                            <li>Encryption at rest & transit (TLS)</li>
+                            <li>Role‑based access, OTP & session controls</li>
+                            <li>Backups, retention, and disaster recovery</li>
+                        </ul>
+                        <div class="mt-3 d-flex gap-2">
+                            <span class="chip"><i class="bi bi-lock-fill me-1"></i> Document Locking</span>
+                            <span class="chip"><i class="bi bi-fingerprint me-1"></i> Audit Trails</span>
+                            <span class="chip"><i class="bi bi-hdd-network me-1"></i> API‑first</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="security" class="py-5">
+        <div class="container">
+            <div class="glass p-5" data-aos="zoom-in">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-8">
+                        <h3 class="fw-bolder mb-1">Ready to accelerate legislative drafting?</h3>
+                        <p class="mb-0">Log in to access your role‑based dashboard for instructions, drafts, reviews, and publication workflows.</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="login.html" class="btn btn-flag cta-btn"><i class="bi bi-box-arrow-in-right me-2"></i>Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-4 mt-5">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="https://www.gov.ls/wp-content/uploads/2017/08/cropped-cropped-1162px-Coat_of_arms_of_Lesotho.svg_-1.png" width="24" height="24" alt="Lesotho Coat of Arms">
+                    <span class="fw-bold">Office of Parliamentary Counsel</span>
+                </div>
+                <div class="small text-muted">© 2025 Government of Lesotho · All rights reserved</div>
+            </div>
         </div>
     </footer>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
     <script>
-        // JWT guard: redirect to login if token missing
-        const token = localStorage.getItem('jwtToken');
-        if (!token) {
-            window.location.href = 'login.html';
+        AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 80 });
+        gsap.from("header.hero h1", { y: 18, opacity: 0, duration: .9 });
+        gsap.from("header.hero .chip", { y: 12, opacity: 0, duration: .6, delay: .1 });
+        gsap.from("header.hero .cta-btn", { y: 12, opacity: 0, duration: .6, delay: .2, stagger: .05 });
+
+        // Workflow preview animation
+        const steps = [
+            { text: 'Intake received', icon: 'bi-inbox', pct: 15 },
+            { text: 'Assigned & in drafting', icon: 'bi-pencil-square', pct: 45 },
+            { text: 'Review in progress', icon: 'bi-search', pct: 70 },
+            { text: 'Ready for publication', icon: 'bi-flag', pct: 100 }
+        ];
+
+        let wfIndex = 0, wfTimer = null;
+        const wfText = document.getElementById('wf-step');
+        const wfIcon = document.getElementById('wf-step-icon');
+        const wfBar = document.getElementById('wf-progress');
+        const wfBtn = document.getElementById('wf-play');
+
+        function renderStep(i) {
+            const s = steps[i];
+            wfText.textContent = s.text;
+            wfIcon.innerHTML = `<i class="bi ${s.icon}"></i>`;
+            wfBar.style.width = s.pct + '%';
+            wfBar.parentElement.setAttribute('aria-valuenow', s.pct);
         }
 
-        // Load notification/message/task counts for nav badges
-        async function loadNavCounts() {
-            try {
-                const res = await fetch('/api/Dashboard/UserCounts', { headers: { Authorization: 'Bearer ' + token } });
-                if (res.ok) {
-                    const data = await res.json();
-                    const n = document.getElementById('navNotifBadge');
-                    const m = document.getElementById('navMsgBadge');
-                    const t = document.getElementById('navTaskBadge');
-                    if (n) n.textContent = data.notifications;
-                    if (m) m.textContent = data.messages;
-                    if (t) t.textContent = data.tasks;
-                }
-            } catch (e) {
-                console.warn('Failed to load nav counts', e);
-            }
+        function cycleOnce() {
+            wfIndex = (wfIndex + 1) % steps.length;
+            renderStep(wfIndex);
         }
 
-        // Roles-based navigation display
-        document.addEventListener('DOMContentLoaded', () => {
-            const payload = JSON.parse(atob(token.split('.')[1] || '{}'));
-            let roles = [];
-            if (payload.role) roles = Array.isArray(payload.role) ? payload.role : [payload.role];
-            if (payload.roles) roles = roles.concat(Array.isArray(payload.roles) ? payload.roles : [payload.roles]);
-            document.querySelectorAll('[data-roles]').forEach(item => {
-                const allowed = item.getAttribute('data-roles').split(',').map(s => s.trim());
-                if (!allowed.includes('All') && !allowed.some(r => roles.includes(r))) {
-                    item.style.display = 'none';
-                }
-            });
-            // Logout
-            document.getElementById('logoutLink').addEventListener('click', e => {
-                e.preventDefault();
-                if (confirm('Are you sure you want to logout?')) {
-                    localStorage.removeItem('jwtToken');
-                    window.location.href = 'login.html';
-                }
-            });
+        function startAuto() {
+            if (wfTimer) clearInterval(wfTimer);
+            wfTimer = setInterval(cycleOnce, 1800);
+        }
 
-            // Load nav counts on page load
-            loadNavCounts();
-            // Refresh counts every 5 minutes
-            setInterval(loadNavCounts, 5 * 60 * 1000);
+        // Start gently after load
+        renderStep(0);
+        startAuto();
+
+        // Manual preview button
+        wfBtn?.addEventListener('click', () => {
+            cycleOnce();
         });
-
-        // Elements
-        const assignedListEl = document.getElementById('assignedList');
-        const docTitleEl = document.getElementById('docTitle');
-        const docStatusEl = document.getElementById('docStatus');
-        const saveStatusEl = document.getElementById('saveStatus');
-        const draftMessageEl = document.getElementById('draftMessage');
-
-        let editorInstance;
-        let currentInstructionId = null;
-        let heartbeatTimer = null;
-        let autosaveTimer = null;
-
-        // Load CKEditor
-        DecoupledDocumentEditor.create(document.querySelector('#editor'), {
-            placeholder: 'Start drafting here…',
-            toolbar: {
-                items: [
-                    'undo', 'redo', '|', 'heading', '|', 'bold', 'italic', 'underline', 'strikethrough', '|',
-                    'bulletedList', 'numberedList', '|', 'link', 'insertTable', 'imageUpload', 'mediaEmbed', '|',
-                    'alignment', '|', 'blockQuote', 'codeBlock', 'pageBreak'
-                ]
-            }
-        }).then(editor => {
-            editorInstance = editor;
-            // Place toolbar in our container
-            document.getElementById('editorToolbar').appendChild(editor.ui.view.toolbar.element);
-            loadAssigned();
-        });
-
-        async function loadAssigned() {
-            assignedListEl.innerHTML = '<div class="list-group-item text-muted">Loading…</div>';
-            try {
-                const res = await fetch('/api/drafts/All', { headers: { Authorization: 'Bearer ' + token } });
-                const data = await res.json();
-                assignedListEl.innerHTML = '';
-                data.forEach(item => {
-                    const btn = document.createElement('button');
-                    btn.className = 'list-group-item list-group-item-action';
-                    btn.textContent = item.title || ('Instruction #' + item.draftingInstructionID);
-                    btn.onclick = () => pickInstruction(item.draftingInstructionID);
-                    assignedListEl.appendChild(btn);
-                });
-            } catch {
-                assignedListEl.innerHTML = '<div class="list-group-item text-danger">Failed to load instructions</div>';
-            }
-        }
-
-        async function pickInstruction(id) {
-            currentInstructionId = id;
-            draftMessageEl.textContent = '';
-            // load brief
-            try {
-                const res = await fetch('/api/DraftingInstructions/' + id, { headers: { Authorization: 'Bearer ' + token } });
-                if (res.ok) {
-                    const d = await res.json();
-                    docTitleEl.textContent = d.title || ('Instruction #' + id);
-                    docStatusEl.textContent = d.status ? '(' + d.status + ')' : '';
-                }
-            } catch {}
-            // load draft
-            try {
-                const res = await fetch('/api/drafts/ByInstruction/' + id, { headers: { Authorization: 'Bearer ' + token } });
-                if (res.ok) {
-                    const draft = await res.json();
-                    editorInstance.setData(draft.contentHtml || '');
-                    saveStatusEl.textContent = 'Last saved: ' + new Date(draft.lastModifiedAt || draft.createdAt).toLocaleString();
-                } else {
-                    editorInstance.setData('');
-                    saveStatusEl.textContent = 'No draft yet';
-                }
-            } catch {
-                editorInstance.setData('');
-                saveStatusEl.textContent = 'Error loading draft';
-            }
-            // start timers
-            startHeartbeat();
-            startAutosave();
-            // Load comments
-            loadCommentsComponent();
-            loadCommentsSidebar(id);
-        }
-
-        // Timers
-        function startHeartbeat() {
-            if (heartbeatTimer) clearInterval(heartbeatTimer);
-            heartbeatTimer = setInterval(() => {
-                if (!currentInstructionId) return;
-                fetch('/api/draftlock/heartbeat/' + currentInstructionId, { method: 'POST', headers: { Authorization: 'Bearer ' + token } })
-                    .then(res => { if (!res.ok) { console.warn('Lock lost'); } });
-            }, 5 * 60 * 1000);
-        }
-        function startAutosave() {
-            if (autosaveTimer) clearInterval(autosaveTimer);
-            autosaveTimer = setInterval(() => saveDraft(true), 60 * 1000);
-        }
-
-        // Save & Submit
-        async function saveDraft(silent) {
-            if (!currentInstructionId) return;
-            const content = editorInstance.getData();
-            try {
-                await fetch('/api/drafts/Save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-                    body: JSON.stringify({ draftingInstructionID: currentInstructionId, htmlContent: content })
-                });
-                if (!silent) saveStatusEl.textContent = 'Saved at ' + new Date().toLocaleTimeString();
-            } catch {
-                if (!silent) saveStatusEl.textContent = 'Failed to save';
-            }
-        }
-        async function submitDraft() {
-            if (!currentInstructionId) return;
-            if (!confirm('Submit this draft? You will not be able to edit it after submission.')) return;
-            const content = editorInstance.getData();
-            draftMessageEl.textContent = '';
-            try {
-                const res = await fetch('/api/drafts/Submit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-                    body: JSON.stringify({ draftingInstructionID: currentInstructionId, htmlContent: content })
-                });
-                const result = await res.json().catch(() => ({ message: 'Draft submitted' }));
-                draftMessageEl.textContent = result.message || 'Submitted!';
-            } catch {
-                draftMessageEl.textContent = 'Submission failed';
-            }
-        }
-
-        document.getElementById('btnSave').addEventListener('click', e => { e.preventDefault(); saveDraft(false); });
-        document.getElementById('btnSubmit').addEventListener('click', e => { e.preventDefault(); submitDraft(); });
-
-        // Exports
-        document.getElementById('btnExportWord').addEventListener('click', e => { e.preventDefault(); exportWord(); });
-        document.getElementById('btnExportPdf').addEventListener('click', e => { e.preventDefault(); exportPdf(); });
-
-        function exportWord() {
-            if (!editorInstance) return;
-            const html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' + editorInstance.getData() + '</body></html>';
-            const converted = window.htmlDocx.asBlob(html);
-            const fileName = (docTitleEl.textContent || 'draft') + '.docx';
-            saveAs(converted, fileName);
-        }
-        function exportPdf() {
-            const element = document.createElement('div');
-            element.innerHTML = editorInstance.getData();
-            const opt = { margin: 1, filename: (docTitleEl.textContent || 'draft') + '.pdf', html2canvas: { scale: 1 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
-            html2pdf().from(element).set(opt).save();
-        }
-
-        // Comments integration
-        document.getElementById('btnCommentsToggle').addEventListener('click', e => {
-            e.preventDefault();
-            toggleCommentsSidebar();
-        });
-        function loadCommentsComponent() {
-            if (document.getElementById('commentsSidebar').innerHTML.trim() !== '') return;
-            fetch('components/comments-sidebar.html')
-                .then(res => res.text())
-                .then(html => {
-                    document.getElementById('commentsSidebar').innerHTML = html;
-                    // Show floating toggle
-                    document.getElementById('toggleCommentsBtn').style.display = 'flex';
-                    document.getElementById('toggleCommentsBtn').addEventListener('click', () => toggleCommentsSidebar());
-                });
-        }
-
-        // Toggle Comments sidebar visibility
-        function toggleCommentsSidebar(forceShow) {
-            const sidebar = document.getElementById('commentsSidebar');
-            const isVisible = sidebar.style.display !== 'none' && sidebar.style.display !== '';
-            const show = forceShow !== undefined ? forceShow : !isVisible;
-            sidebar.style.display = show ? 'block' : 'none';
-        }
-
     </script>
 </body>
 </html>
